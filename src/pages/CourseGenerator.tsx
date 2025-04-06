@@ -77,7 +77,7 @@ const CourseGenerator = () => {
     },
     onSuccess: (courseId) => {
       sonnerToast.info('Course Generation Started', {
-        description: 'Your course is being generated in the background with notes. You can continue browsing the site.',
+        description: 'Your course is being generated with notes. You can continue browsing the site.',
         duration: 6000,
       });
       

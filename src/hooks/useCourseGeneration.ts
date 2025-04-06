@@ -4,10 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast as sonnerToast } from "sonner";
 import { CourseType } from "@/types";
 import { getStaticCourse } from "@/data/staticCourses";
-import { 
-  generateCourseWithOpenAI, 
-  generateCourseFallback 
-} from "@/services/openaiService";
 
 // Define an interface for the content structure
 interface CourseContent {
@@ -26,10 +22,7 @@ export const useCourseGeneration = () => {
   const [courseGenerationId, setCourseGenerationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  const [retryCount, setRetryCount] = useState(0);
-  const [useFallback, setUseFallback] = useState(false);
   const [generationStartTime, setGenerationStartTime] = useState<Date | null>(null);
-  const [useStaticData, setUseStaticData] = useState(true); // Always use static data
 
   useEffect(() => {
     let intervalId: number | null = null;
@@ -110,7 +103,7 @@ export const useCourseGeneration = () => {
     };
   }, [generationInBackground, courseGenerationId]);
 
-  // Create a function to start course generation
+  // Create a function to start course generation (using only static data)
   const startCourseGeneration = async (
     courseName: string, 
     purpose: CourseType['purpose'], 
@@ -118,12 +111,10 @@ export const useCourseGeneration = () => {
     userId: string
   ) => {
     try {
-      console.log("Starting course generation for:", courseName);
+      console.log("Starting static course generation for:", courseName);
       
       // Reset progress and set start time
       setProgress(10);
-      setRetryCount(0);
-      setUseFallback(false);
       setGenerationStartTime(new Date());
       
       // Step 1: Create an empty course entry
@@ -157,25 +148,16 @@ export const useCourseGeneration = () => {
       setError(null);
       setProgress(20);
 
-      // Start the background process
-      if (useStaticData) {
-        // Simulate time for course generation
-        setTimeout(() => {
-          processStaticCourseGeneration(
-            courseName,
-            purpose,
-            difficulty as "beginner" | "intermediate" | "advanced",
-            emptyCourse.id
-          );
-        }, 120000); // 2 minutes of "generation time"
-      } else {
-        processBackgroundCourseGeneration(
+      // Start the background process with static data
+      // Simulate time for course generation
+      setTimeout(() => {
+        processStaticCourseGeneration(
           courseName,
           purpose,
-          difficulty,
+          difficulty as "beginner" | "intermediate" | "advanced",
           emptyCourse.id
         );
-      }
+      }, 5000); // 5 seconds of "generation time" for better user experience
       
       return emptyCourse.id;
     } catch (error: any) {
@@ -250,175 +232,16 @@ export const useCourseGeneration = () => {
     }
   };
 
-  // Background processing function to handle course generation
-  const processBackgroundCourseGeneration = async (
-    topic: string,
-    purpose: CourseType['purpose'],
-    difficulty: CourseType['difficulty'],
-    courseId: string
-  ) => {
-    try {
-      // Update course status to generating
-      await supabase
-        .from('courses')
-        .update({ 
-          content: { status: 'generating', lastUpdated: new Date().toISOString() } 
-        })
-        .eq('id', courseId);
-        
-      console.log(`Updated course ${courseId} status to generating`);
-      setProgress(30);
-
-      // Call OpenAI API through Edge Function
-      console.log(`Calling OpenAI API for course ${courseId}`);
-      
-      try {
-        const response = useFallback 
-          ? await generateCourseFallback(topic, purpose, difficulty)
-          : await generateCourseWithOpenAI(courseId, topic, purpose, difficulty);
-        
-        if (!response.success) {
-          // If API call failed but retries are available, try again
-          if (retryCount < 2 && !useFallback) {
-            setRetryCount(prev => prev + 1);
-            console.log(`API call failed, retrying (${retryCount + 1}/3)...`);
-            
-            // Update progress to indicate retry
-            setProgress(35);
-            
-            // Wait 3 seconds before retry
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            
-            // Try again recursively
-            return processBackgroundCourseGeneration(topic, purpose, difficulty, courseId);
-          }
-          
-          // If we've exhausted retries, switch to fallback mode
-          if (!useFallback) {
-            console.log("Switching to fallback generation mode");
-            setUseFallback(true);
-            
-            // Update progress to indicate fallback
-            setProgress(40);
-            
-            // Try again with fallback
-            return processBackgroundCourseGeneration(topic, purpose, difficulty, courseId);
-          }
-          
-          throw new Error(response.error || 'Unknown error from OpenAI API');
-        }
-        
-        console.log(`Background generation completed successfully for course ${courseId}`);
-        setProgress(70);
-        
-        // Extract text content from response
-        const text = response.text || '';
-        
-        if (!text) {
-          throw new Error('Empty response from OpenAI API');
-        }
-        
-        // Extract summary
-        let summary = `An AI-generated course on ${topic}`;
-        const summaryMatch = text.match(/# SUMMARY[:\n]+([^#]+)/i);
-        if (summaryMatch && summaryMatch[1]) {
-          summary = summaryMatch[1].trim().substring(0, 500);
-        }
-        
-        // Parse the content into structured format
-        const parsedContent = parseGeneratedContent(text);
-        setProgress(90);
-        
-        // Update course with complete content
-        await supabase
-          .from('courses')
-          .update({ 
-            summary,
-            content: {
-              status: 'complete',
-              fullText: text,
-              generatedAt: new Date().toISOString(),
-              parsedContent
-            } 
-          })
-          .eq('id', courseId);
-          
-        console.log(`Course ${courseId} updated with generated content`);
-        setProgress(100);
-      } catch (error: any) {
-        console.error(`Error calling OpenAI API: ${error.message}`);
-        throw error;
-      }
-      
-    } catch (error: any) {
-      console.error(`Error in background processing for course ${courseId}:`, error);
-      setProgress(0);
-      
-      // Try to update the course with error status
-      try {
-        await supabase
-          .from('courses')
-          .update({ 
-            content: { 
-              status: 'error', 
-              message: error.message || 'Unknown error during background processing',
-              lastUpdated: new Date().toISOString()
-            } 
-          })
-          .eq('id', courseId);
-          
-        console.log(`Updated course ${courseId} status to error due to processing error`);
-      } catch (updateError: any) {
-        console.error(`Failed to update error status for course ${courseId}:`, updateError);
-      }
-    }
-  };
-
-  // Helper function to parse the generated content
-  const parseGeneratedContent = (text: string) => {
-    const parsedContent = {
-      summary: "",
-      chapters: []
-    };
-
-    // Extract summary
-    const summaryMatch = text.match(/# SUMMARY\s*\n([\s\S]*?)(?=\n# |\n## |$)/i);
-    if (summaryMatch && summaryMatch[1]) {
-      parsedContent.summary = summaryMatch[1].trim();
-    }
-
-    // Extract chapters
-    const chaptersSection = text.match(/# CHAPTERS\s*\n([\s\S]*?)(?=\n# |$)/i);
-    if (chaptersSection && chaptersSection[1]) {
-      const chaptersText = chaptersSection[1];
-      const chapterBlocks = chaptersText.split(/\n(?=## )/g);
-      
-      parsedContent.chapters = chapterBlocks.map((block, index) => {
-        const titleMatch = block.match(/## (.*)/);
-        const title = titleMatch ? titleMatch[1].trim() : `Chapter ${index + 1}`;
-        const content = block.replace(/## .*\n/, '').trim();
-        
-        return {
-          title,
-          content,
-          order_number: index + 1
-        };
-      });
-    }
-
-    return parsedContent;
-  };
-
-  // Generate additional content (flashcards, MCQs, Q&As) separately
+  // Generate additional content from static data
   const generateAdditionalContent = async (
     courseId: string,
     contentType: 'flashcards' | 'mcqs' | 'qna',
     topic: string,
     difficulty?: string
   ) => {
-    // Implementation will be added in the future when needed
-    console.log(`Generating ${contentType} for course ${courseId} on topic ${topic}`);
-    // This would call the appropriate OpenAI API function based on contentType
+    console.log(`Generating static ${contentType} for course ${courseId} on topic ${topic}`);
+    // This would retrieve the appropriate static content based on contentType
+    // Implementation could be added later if needed
   };
 
   return {

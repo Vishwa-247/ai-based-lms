@@ -31,13 +31,17 @@ const EmptyState = ({ message, description }: { message: string, description: st
 const renderMarkdown = (content: string) => {
   if (!content) return '';
   
+  // Enhanced HTML rendering for better course presentation
   return content
     .replace(/^#\s(.+)$/gm, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>')
     .replace(/^##\s(.+)$/gm, '<h2 class="text-xl font-bold mt-5 mb-3">$1</h2>')
     .replace(/^###\s(.+)$/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
     .replace(/^(?!<h[1-6]|<pre|<code|<ul|<ol|<li|<p|<blockquote)(.+)$/gm, '<p class="my-3">$1</p>')
     .replace(/\`\`\`(.+?)\n([\s\S]*?)\`\`\`/g, '<pre class="bg-muted p-4 rounded-md overflow-x-auto my-4"><code>$2</code></pre>')
-    .replace(/\`([^\`]+)\`/g, '<code class="bg-muted px-1 py-0.5 rounded text-sm">$1</code>');
+    .replace(/\`([^\`]+)\`/g, '<code class="bg-muted px-1 py-0.5 rounded text-sm">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p class="my-3">');
 };
 
 // Type guard to check if content is a valid object with parsedContent
