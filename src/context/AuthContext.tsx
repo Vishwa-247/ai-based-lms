@@ -22,13 +22,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  // useNavigate hook is now safely used inside the Router context
   const navigate = useNavigate();
 
   // Function to sync user data with our users table
   const syncUserProfile = async (userId: string, fullName: string, email: string) => {
     try {
-      console.log("Syncing user profile:", { userId, fullName, email });
+      console.log("Syncing user profile:", { userId, fullName });
       
       const { error } = await supabase
         .from('users')
@@ -44,8 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Error syncing user profile:", error);
         throw error;
       }
-      
-      console.log("User profile synced successfully");
     } catch (error: any) {
       console.error("Error syncing user profile:", error.message);
       toast({
@@ -61,13 +58,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     async function initializeAuth() {
       try {
-        // Set loading state
         if (mounted) setIsLoading(true);
         
-        // Get initial session
+        // Clear any existing session and user data first
+        if (mounted) {
+          setSession(null);
+          setUser(null);
+        }
+        
+        // Get current session (but don't persist)
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (mounted) {
+        if (mounted && session) {
           setSession(session);
           setUser(session?.user ?? null);
           
@@ -93,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
@@ -120,7 +122,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password,
+        options: {
+          // Don't persist session
+          persistSession: false
+        }
+      });
+      
       if (error) throw error;
       
       toast({
@@ -152,6 +162,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             full_name: fullName,
             role: 'user',
           },
+          // Don't persist session
+          persistSession: false
         },
       });
       
@@ -168,7 +180,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       // Redirect to dashboard if email confirmation is not required
-      // Otherwise, stay on the current page with a message to check email
       if (data?.session) {
         navigate('/dashboard');
       }

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCourseGeneration } from "@/hooks/useCourseGeneration";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
+// Static questions based on job role
 const staticInterviewQuestions = {
   "Software Engineer": [
     "Tell me about your experience with software development methodologies like Agile or Scrum.",
@@ -167,8 +169,9 @@ const MockInterview = () => {
       setInterviewData(newInterview);
       console.log("Interview created:", newInterview);
 
+      // Get questions based on role from static data
       const questionList = staticInterviewQuestions[role as keyof typeof staticInterviewQuestions] || 
-                           staticInterviewQuestions.Default;
+                         staticInterviewQuestions.Default;
       
       const generatedQuestions = questionList.map((question, index) => ({
         id: crypto.randomUUID(),
@@ -211,8 +214,11 @@ const MockInterview = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const interview = recentInterviews.find(i => i.id === interviewId);
-      if (!interview) throw new Error("Interview not found");
+      if (!interview) {
+        throw new Error("Interview not found");
+      }
       
+      // Get questions based on role from static data
       const questionList = staticInterviewQuestions[interview.job_role as keyof typeof staticInterviewQuestions] || 
                          staticInterviewQuestions.Default;
       
