@@ -70,6 +70,77 @@ serve(async (req) => {
                  Ensure the course is educational, accurate, and tailored to ${data.purpose} at ${data.difficulty} level.`;
         break;
 
+      case 'generate_study_notes':
+        prompt = `You are an AI tutor. Generate detailed study notes on the topic: "${data.topic}"
+                with the following difficulty level: ${data.difficulty}. Keep it beginner-friendly if easy, or deep and advanced if hard.
+                Return in clean markdown format with headings, bullet points, and examples.`;
+        generationConfig.maxOutputTokens = 4096;
+        break;
+
+      case 'generate_flashcards':
+        prompt = `Generate 10 flashcards for the topic "${data.topic}".
+                Each flashcard should be in the format:
+                Q: Question here?
+                A: Answer here.
+                Target difficulty: ${data.difficulty}.`;
+        generationConfig.maxOutputTokens = 2048;
+        break;
+
+      case 'generate_mcqs':
+        prompt = `Generate 10 multiple choice questions for "${data.topic}" with difficulty level "${data.difficulty}".
+                Each question should have 4 options and clearly indicate the correct answer.
+                Return in JSON format:
+                [
+                  {
+                    "question": "...",
+                    "options": ["A", "B", "C", "D"],
+                    "answer": "A"
+                  },
+                  ...
+                ]`;
+        generationConfig.maxOutputTokens = 2048;
+        break;
+
+      case 'generate_qna':
+        prompt = `Generate a list of 10 potential questions and answers on the topic "${data.topic}".
+                The questions should reflect real-world use cases and interview-style questions.
+                Output format:
+                Q: ...
+                A: ...`;
+        generationConfig.maxOutputTokens = 2048;
+        break;
+
+      case 'analyze_interview':
+        prompt = `You are a communication skill evaluator. Analyze the following response from a user during a mock interview:
+
+                "${data.answer}"
+
+                Question they were answering: "${data.question}"
+                Job role: ${data.jobRole}
+
+                Evaluate it based on:
+                1. Clarity of thought
+                2. Speaking structure
+                3. Use of filler words
+                4. Grammar
+                5. Confidence
+
+                Give feedback and suggestions for improvement. Return a communication score out of 10.`;
+        generationConfig.temperature = 0.3;
+        generationConfig.maxOutputTokens = 2048;
+        break;
+
+      case 'generate_course_suggestions':
+        prompt = `Based on the communication analysis below, suggest 3 AI-generated micro-courses to improve the user's speaking or soft skills:
+
+                Analysis:
+                "${data.feedback}"
+
+                Each course should have a name, short description, and difficulty level.`;
+        generationConfig.temperature = 0.7;
+        generationConfig.maxOutputTokens = 2048;
+        break;
+
       case 'generate_interview_questions':
         prompt = `Generate ${data.questionCount || 5} interview questions for a ${data.experience} years experienced ${data.jobRole} 
                  with expertise in ${data.techStack}. The questions should be challenging and relevant to the role.
@@ -81,32 +152,6 @@ serve(async (req) => {
                  4. Assess teamwork and collaboration skills
                  Format as a numbered list.`;
         generationConfig.maxOutputTokens = 2048;
-        break;
-
-      case 'analyze_interview':
-        prompt = `Analyze this interview response for a ${data.jobRole} position. \n
-                 Question: ${data.question}\n
-                 Answer: ${data.answer}\n\n
-                 Provide detailed analysis in the following format:\n\n
-                 Technical Feedback: (Analyze understanding of technical concepts and accuracy)\n
-                 Communication Feedback: (Analyze clarity, structure, and language used)\n
-                 Strengths: (List 3 specific strengths in the response)\n
-                 Areas to Improve: (List 3 specific areas that could be improved)\n
-                 Overall Rating: (Give a rating between 0-100)`;
-        generationConfig.temperature = 0.3;
-        generationConfig.maxOutputTokens = 2048;
-        break;
-
-      case 'generate_flashcards':
-        prompt = `Generate 20 detailed flashcards on the topic: ${data.topic} for ${data.purpose} at ${data.difficulty} level.\n
-                 Create flashcards in this exact format:\n\n
-                 # FLASHCARDS\n
-                 - Question: [Specific, clear question text]\n
-                 - Answer: [Comprehensive, accurate answer text]\n\n
-                 Make sure the flashcards cover key concepts, terms, principles, and applications related to the topic.\n
-                 Each answer should be detailed enough to provide complete understanding.\n
-                 Ensure varying difficulty levels across the flashcards to test different aspects of knowledge.`;
-        generationConfig.maxOutputTokens = 4096;
         break;
 
       default:
@@ -164,7 +209,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({
         success: true,
         data: responseData,
-        text: text // Include the extracted text
+        text: text
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

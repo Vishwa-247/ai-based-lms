@@ -48,6 +48,38 @@ def generate():
                      f"- Question: [detailed question]\n"
                      f"- Answer: [comprehensive answer]\n\n"
                      f"Ensure the course is educational, accurate, and tailored to {request_data['purpose']} at {request_data['difficulty']} level.")
+
+        elif action == 'generate_study_notes':
+            prompt = (f"You are an AI tutor. Generate detailed study notes on the topic: \"{request_data['topic']}\"\n"
+                     f"with the following difficulty level: {request_data['difficulty']}. Keep it beginner-friendly if easy, or deep and advanced if hard.\n"
+                     f"Return in clean markdown format with headings, bullet points, and examples.")
+
+        elif action == 'generate_flashcards':
+            prompt = (f"Generate 10 flashcards for the topic \"{request_data['topic']}\".\n"
+                     f"Each flashcard should be in the format:\n"
+                     f"Q: Question here?\n"
+                     f"A: Answer here.\n"
+                     f"Target difficulty: {request_data['difficulty']}.")
+
+        elif action == 'generate_mcqs':
+            prompt = (f"Generate 10 multiple choice questions for \"{request_data['topic']}\" with difficulty level \"{request_data['difficulty']}\".\n"
+                     f"Each question should have 4 options and clearly indicate the correct answer.\n"
+                     f"Return in JSON format:\n"
+                     f"[\n"
+                     f"  {{\n"
+                     f"    \"question\": \"...\",\n"
+                     f"    \"options\": [\"A\", \"B\", \"C\", \"D\"],\n"
+                     f"    \"answer\": \"A\"\n"
+                     f"  }},\n"
+                     f"  ...\n"
+                     f"]")
+        
+        elif action == 'generate_qna':
+            prompt = (f"Generate a list of 10 potential questions and answers on the topic \"{request_data['topic']}\".\n"
+                     f"The questions should reflect real-world use cases and interview-style questions.\n"
+                     f"Output format:\n"
+                     f"Q: ...\n"
+                     f"A: ...")
         
         elif action == 'generate_interview_questions':
             prompt = (f"Generate {request_data.get('questionCount', 5)} interview questions for a {request_data['experience']} years experienced {request_data['jobRole']} "
@@ -60,25 +92,17 @@ def generate():
                      f"Format as a numbered list.")
         
         elif action == 'analyze_interview':
-            prompt = (f"Analyze this interview response for a {request_data['jobRole']} position. \n"
-                     f"Question: {request_data['question']}\n"
-                     f"Answer: {request_data['answer']}\n\n"
-                     f"Provide detailed analysis in the following format:\n\n"
-                     f"Technical Feedback: (Analyze understanding of technical concepts and accuracy)\n"
-                     f"Communication Feedback: (Analyze clarity, structure, and language used)\n"
-                     f"Strengths: (List 3 specific strengths in the response)\n"
-                     f"Areas to Improve: (List 3 specific areas that could be improved)\n"
-                     f"Overall Rating: (Give a rating between 0-100)")
-        
-        elif action == 'generate_flashcards':
-            prompt = (f"Generate 20 detailed flashcards on the topic: {request_data['topic']} for {request_data['purpose']} at {request_data['difficulty']} level.\n"
-                     f"Create flashcards in this exact format:\n\n"
-                     f"# FLASHCARDS\n"
-                     f"- Question: [Specific, clear question text]\n"
-                     f"- Answer: [Comprehensive, accurate answer text]\n\n"
-                     f"Make sure the flashcards cover key concepts, terms, principles, and applications related to the topic.\n"
-                     f"Each answer should be detailed enough to provide complete understanding.\n"
-                     f"Ensure varying difficulty levels across the flashcards to test different aspects of knowledge.")
+            prompt = (f"You are a communication skill evaluator. Analyze the following response from a user during a mock interview:\n\n"
+                     f"\"{request_data['answer']}\"\n\n"
+                     f"Question they were answering: \"{request_data['question']}\"\n"
+                     f"Job role: {request_data['jobRole']}\n\n"
+                     f"Evaluate it based on:\n"
+                     f"1. Clarity of thought\n"
+                     f"2. Speaking structure\n"
+                     f"3. Use of filler words\n"
+                     f"4. Grammar\n"
+                     f"5. Confidence\n\n"
+                     f"Give feedback and suggestions for improvement. Return a communication score out of 10.")
         
         elif action == 'custom_content':
             prompt = data.get('prompt', '')
