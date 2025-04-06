@@ -29,20 +29,24 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
 
   const popularRoles = [
     "Software Engineer",
-    "Data Scientist",
     "Frontend Developer",
-    "Backend Developer",
+    "Backend Developer", 
+    "Full Stack Developer",
     "DevOps Engineer",
+    "Data Scientist",
     "ML Engineer",
+    "Cloud Architect"
   ];
 
   const popularTechStacks = [
     "React, Node.js",
-    "Python, TensorFlow",
-    "Java, Spring",
     "JavaScript, React",
     "Python, Django",
+    "Java, Spring",
+    "AWS, Docker, Kubernetes",
+    "Python, TensorFlow, PyTorch",
     "Go, Docker",
+    "Angular, .NET"
   ];
 
   return (

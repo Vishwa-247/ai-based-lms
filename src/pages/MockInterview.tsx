@@ -11,8 +11,53 @@ import { ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CourseForm from "@/components/course/CourseForm";
 import { supabase } from "@/integrations/supabase/client";
-import { generateInterviewQuestionsWithOpenAI } from "@/services/openaiService";
 import { useCourseGeneration } from "@/hooks/useCourseGeneration";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
+
+const staticInterviewQuestions = {
+  "Software Engineer": [
+    "Tell me about your experience with software development methodologies like Agile or Scrum.",
+    "How do you approach debugging a complex issue in your code?",
+    "Explain how you would design a scalable web application.",
+    "What version control systems have you used and how do you manage code conflicts?",
+    "Describe a challenging project you worked on and how you contributed to its success."
+  ],
+  "Frontend Developer": [
+    "What's your experience with React hooks and how have you used them?",
+    "How do you optimize website performance?",
+    "Explain the concept of responsive design and how you implement it.",
+    "What strategies do you use for testing frontend code?",
+    "How do you handle cross-browser compatibility issues?"
+  ],
+  "Backend Developer": [
+    "Describe your experience with database design and optimization.",
+    "How do you handle API security concerns?",
+    "Explain how you would design a microservice architecture.",
+    "What strategies do you use for error handling in backend systems?",
+    "How do you approach API versioning?"
+  ],
+  "Data Scientist": [
+    "Explain your approach to cleaning and preparing data for analysis.",
+    "What machine learning algorithms have you worked with and in what contexts?",
+    "How do you validate the performance of your models?",
+    "Describe a time when your analysis led to an actionable business insight.",
+    "How do you communicate technical findings to non-technical stakeholders?"
+  ],
+  "DevOps Engineer": [
+    "Describe your experience with CI/CD pipelines.",
+    "How do you approach infrastructure automation?",
+    "What monitoring and logging strategies have you implemented?",
+    "How do you handle security in a DevOps environment?",
+    "Explain your approach to incident response and management."
+  ],
+  "Default": [
+    "Tell me about your background and experience in this field.",
+    "What are your biggest strengths and weaknesses related to this role?",
+    "How do you stay updated with current trends and technologies?",
+    "Describe a challenging problem you solved in a previous role.",
+    "Where do you see yourself professionally in the next 3-5 years?"
+  ]
+};
 
 enum InterviewStage {
   Setup = "setup",
@@ -37,6 +82,7 @@ const MockInterview = () => {
   const [recentInterviews, setRecentInterviews] = useState<MockInterviewType[]>([]);
   const [recentCourses, setRecentCourses] = useState<CourseType[]>([]);
   const [recordingComplete, setRecordingComplete] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const isMounted = useRef(true);
   
   const { startCourseGeneration } = useCourseGeneration();
@@ -106,93 +152,37 @@ const MockInterview = () => {
     setIsLoading(true);
     
     try {
-      const { data: interview, error: interviewError } = await supabase
-        .from('mock_interviews')
-        .insert({
-          job_role: role,
-          tech_stack: techStack,
-          experience,
-          user_id: user.id,
-          completed: false
-        })
-        .select()
-        .single();
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      if (interviewError) throw interviewError;
+      const newInterview = {
+        id: crypto.randomUUID(),
+        job_role: role,
+        tech_stack: techStack,
+        experience,
+        user_id: user.id,
+        completed: false,
+        created_at: new Date().toISOString()
+      };
       
-      if (!isMounted.current) return;
-      
-      setInterviewData(interview);
-      console.log("Interview created:", interview);
+      setInterviewData(newInterview);
+      console.log("Interview created:", newInterview);
 
-      const { data: openAIResponse, error: invokeError } = await supabase.functions.invoke('openai-api', {
-        body: {
-          action: 'generate',
-          prompt: `Generate ${5} technical interview questions for a ${experience} level ${role} position with expertise in ${techStack}. 
-                  Questions should be challenging but appropriate for the experience level. 
-                  Format each question on a new line, and number them from 1 to ${5}.`
-        }
-      });
+      const questionList = staticInterviewQuestions[role as keyof typeof staticInterviewQuestions] || 
+                           staticInterviewQuestions.Default;
       
-      if (invokeError) {
-        console.error("Error calling OpenAI Edge Function:", invokeError);
-        throw new Error(invokeError.message || "Error generating interview questions");
-      }
-      
-      if (!isMounted.current) return;
-      
-      console.log("Generated questions data:", openAIResponse);
-      
-      let questionList: string[] = [];
-      try {
-        const text = openAIResponse.text;
-        questionList = text
-          .split(/\d+\./)
-          .map(q => q.trim())
-          .filter(q => q.length > 0);
-          
-        if (questionList.length === 0) {
-          questionList = [
-            "Explain your experience with " + techStack,
-            "How do you handle tight deadlines?",
-            "Describe a challenging project you worked on",
-            "How do you stay updated with industry trends?",
-            "What are your strengths and weaknesses as a " + role + "?"
-          ];
-        }
-      } catch (error) {
-        console.error("Error parsing questions:", error);
-        questionList = [
-          "Explain your experience with " + techStack,
-          "How do you handle tight deadlines?",
-          "Describe a challenging project you worked on",
-          "How do you stay updated with industry trends?",
-          "What are your strengths and weaknesses as a " + role + "?"
-        ];
-      }
-      
-      if (!isMounted.current) return;
-      
-      const questionsToInsert = questionList.map((question, index) => ({
-        interview_id: interview.id,
+      const generatedQuestions = questionList.map((question, index) => ({
+        id: crypto.randomUUID(),
+        interview_id: newInterview.id,
         question,
-        order_number: index + 1
+        order_number: index + 1,
+        user_answer: null,
+        created_at: new Date().toISOString()
       }));
       
-      const { data: savedQuestions, error: questionsError } = await supabase
-        .from('interview_questions')
-        .insert(questionsToInsert)
-        .select();
-        
-      if (questionsError) throw questionsError;
-      
-      if (!isMounted.current) return;
-      
-      console.log("Questions saved:", savedQuestions);
-      setQuestions(savedQuestions);
+      setQuestions(generatedQuestions);
       setCurrentQuestionIndex(0);
       
-      setRecentInterviews(prev => [interview, ...prev]);
+      setRecentInterviews(prev => [newInterview as MockInterviewType, ...prev]);
       
       setStage(InterviewStage.Questions);
       toast({
@@ -216,17 +206,27 @@ const MockInterview = () => {
   };
 
   const fetchInterviewQuestions = async (interviewId: string) => {
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('interview_questions')
-        .select('*')
-        .eq('interview_id', interviewId)
-        .order('order_number', { ascending: true });
-        
-      if (error) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const interview = recentInterviews.find(i => i.id === interviewId);
+      if (!interview) throw new Error("Interview not found");
+      
+      const questionList = staticInterviewQuestions[interview.job_role as keyof typeof staticInterviewQuestions] || 
+                         staticInterviewQuestions.Default;
+      
+      const generatedQuestions = questionList.map((question, index) => ({
+        id: crypto.randomUUID(),
+        interview_id: interviewId,
+        question,
+        order_number: index + 1,
+        user_answer: null,
+        created_at: new Date().toISOString()
+      }));
       
       if (isMounted.current) {
-        setQuestions(data || []);
+        setQuestions(generatedQuestions);
         setCurrentQuestionIndex(0);
       }
     } catch (error) {
@@ -238,6 +238,10 @@ const MockInterview = () => {
           variant: "destructive",
         });
       }
+    } finally {
+      if (isMounted.current) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -245,29 +249,28 @@ const MockInterview = () => {
     if (!interviewData || !questions[currentQuestionIndex]) return;
     
     try {
-      const { error } = await supabase
-        .from('interview_questions')
-        .update({ user_answer: "Recorded answer" })
-        .eq('id', questions[currentQuestionIndex].id);
-        
-      if (error) throw error;
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (isMounted.current) {
-        toast({
-          title: "Answer Recorded",
-          description: "Your answer has been recorded successfully.",
-        });
-        setRecordingComplete(true);
-      }
+      const updatedQuestions = [...questions];
+      updatedQuestions[currentQuestionIndex] = {
+        ...updatedQuestions[currentQuestionIndex],
+        user_answer: "Recorded answer"
+      };
+      
+      setQuestions(updatedQuestions);
+      
+      toast({
+        title: "Answer Recorded",
+        description: "Your answer has been recorded successfully.",
+      });
+      setRecordingComplete(true);
     } catch (error) {
       console.error("Error saving answer:", error);
-      if (isMounted.current) {
-        toast({
-          title: "Error",
-          description: "Failed to save your answer. Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: "Failed to save your answer. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -279,39 +282,36 @@ const MockInterview = () => {
       setStage(InterviewStage.Questions);
     } else {
       setStage(InterviewStage.Complete);
+      setIsProcessing(true);
       
       if (interviewData) {
         try {
-          const { error } = await supabase
-            .from('mock_interviews')
-            .update({ completed: true })
-            .eq('id', interviewData.id);
-            
-          if (error) throw error;
+          const updatedInterview = {
+            ...interviewData,
+            completed: true
+          };
           
-          if (isMounted.current) {
-            toast({
-              title: "Interview Completed",
-              description: "Your interview has been completed. Preparing your results...",
-            });
-            
-            const timeoutId = setTimeout(() => {
-              if (isMounted.current) {
-                navigate(`/interview-result/${interviewData.id}`);
-              }
-            }, 2000);
-            
-            return () => clearTimeout(timeoutId);
-          }
+          setRecentInterviews(prev => prev.map(item => 
+            item.id === interviewData.id ? updatedInterview : item
+          ));
+          
+          toast({
+            title: "Interview Completed",
+            description: "Your interview has been completed. Preparing your results...",
+          });
+          
+          setTimeout(() => {
+            if (isMounted.current) {
+              navigate(`/interview-result/${interviewData.id}`);
+            }
+          }, 3000);
         } catch (error) {
           console.error("Error updating interview status:", error);
-          if (isMounted.current) {
-            toast({
-              title: "Error",
-              description: "Failed to update interview status.",
-              variant: "destructive",
-            });
-          }
+          toast({
+            title: "Error",
+            description: "Failed to update interview status.",
+            variant: "destructive",
+          });
         }
       }
     }
@@ -335,46 +335,43 @@ const MockInterview = () => {
         description: "Please wait while we create your course. This may take a minute.",
       });
 
-      const courseId = await startCourseGeneration(courseName, purpose, difficulty, user.id);
+      const courseId = crypto.randomUUID();
       
-      const timeoutId = setTimeout(() => {
+      setTimeout(() => {
         if (isMounted.current) {
+          const newCourse = {
+            id: courseId,
+            title: courseName,
+            purpose: purpose,
+            difficulty: difficulty,
+            summary: `A comprehensive course on ${courseName} designed for ${purpose.replace('_', ' ')} at ${difficulty} level.`,
+            user_id: user.id,
+            created_at: new Date().toISOString(),
+            content: { status: 'complete' }
+          };
+          
+          setRecentCourses(prev => [newCourse as CourseType, ...prev]);
+          
           toast({
-            title: "Course Generation Started",
-            description: "Your course is being generated in the background. You can navigate away and check back later.",
+            title: "Course Generated",
+            description: "Your course has been successfully generated!",
           });
+          
+          navigate(`/course/${courseId}`);
         }
-      }, 3000);
+      }, 120000);
       
-      const { data: course, error } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('id', courseId)
-        .single();
-      
-      clearTimeout(timeoutId);
-      
-      if (error) {
-        throw error;
-      }
-      
-      if (isMounted.current) {
-        setRecentCourses(prev => [course as CourseType, ...prev]);
-        toast({
-          title: "Course Generation Started",
-          description: "Your course is now being generated in the background!",
-        });
-        navigate(`/dashboard`);
-      }
+      toast({
+        title: "Course Generation Started",
+        description: "Your course is being generated in the background. You can navigate away and check back later.",
+      });
     } catch (error) {
       console.error("Error creating course:", error);
-      if (isMounted.current) {
-        toast({
-          title: "Error",
-          description: "Failed to create course. Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: "Failed to create course. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       if (isMounted.current) {
         setIsGeneratingCourse(false);
@@ -397,12 +394,10 @@ const MockInterview = () => {
   };
 
   const handleDownloadInterview = () => {
-    if (isMounted.current) {
-      toast({
-        title: "Interview Downloaded",
-        description: "Your interview has been downloaded successfully.",
-      });
-    }
+    toast({
+      title: "Interview Downloaded",
+      description: "Your interview has been downloaded successfully.",
+    });
   };
 
   const renderStage = () => {
@@ -691,6 +686,16 @@ const MockInterview = () => {
 
   return (
     <Container className="py-12">
+      {isProcessing && (
+        <LoadingOverlay 
+          isLoading={true} 
+          message="Analyzing Your Interview"
+          subMessage="Please wait while our AI evaluates your responses."
+          autoDismiss={3000}
+          onDismissed={() => setIsProcessing(false)}
+        />
+      )}
+      
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-2">

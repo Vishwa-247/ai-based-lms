@@ -1,20 +1,40 @@
 
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface LoadingOverlayProps {
   isLoading: boolean;
   message?: string;
   subMessage?: string;
   minimal?: boolean;
+  autoDismiss?: number; // Time in ms after which to auto-dismiss
+  onDismissed?: () => void;
 }
 
 const LoadingOverlay = ({ 
   isLoading, 
   message = "Processing", 
   subMessage = "Please wait while we process your request.",
-  minimal = false
+  minimal = false,
+  autoDismiss,
+  onDismissed
 }: LoadingOverlayProps) => {
-  if (!isLoading) return null;
+  const [visible, setVisible] = useState(isLoading);
+  
+  useEffect(() => {
+    setVisible(isLoading);
+    
+    if (isLoading && autoDismiss) {
+      const timer = setTimeout(() => {
+        setVisible(false);
+        if (onDismissed) onDismissed();
+      }, autoDismiss);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, autoDismiss, onDismissed]);
+  
+  if (!visible) return null;
   
   if (minimal) {
     return (
