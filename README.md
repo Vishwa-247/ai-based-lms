@@ -35,6 +35,30 @@ VITE_GEMINI_API_KEY=your_gemini_api_key_here
    npm run dev
    ```
 
+## Available Static Courses
+
+StudyMate supports the following course topics with static data for demonstration purposes:
+
+### Network Security
+- **Topics**: Any topic containing "network" will generate Network Security content
+- **Difficulties**: beginner, intermediate, advanced
+- **Example**: "Network Security Fundamentals", "Cyber Network Protection"
+
+### Machine Learning
+- **Topics**: Any topic containing "machine" will generate Machine Learning content
+- **Difficulties**: beginner, intermediate, advanced
+- **Example**: "Machine Learning Basics", "Deep Machine Learning"
+
+### Data Mining
+- **Topics**: Any topic containing "data" will generate Data Mining content
+- **Difficulties**: beginner, intermediate, advanced
+- **Example**: "Data Mining Techniques", "Big Data Analytics"
+
+### Full Stack Development
+- **Topics**: Any topic containing "stack" will generate Full Stack Development content
+- **Difficulties**: beginner, intermediate, advanced
+- **Example**: "Full Stack Web Development", "MERN Stack Development"
+
 ## How Gemini API Calls Work
 
 StudyMate uses direct calls to the Gemini API from the frontend:
