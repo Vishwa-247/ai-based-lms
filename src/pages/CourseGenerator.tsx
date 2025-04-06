@@ -27,7 +27,7 @@ const CourseGenerator = () => {
     {
       id: "dummy-course-1",
       title: "React Hooks Masterclass",
-      purpose: "professional_development",
+      purpose: "practice", // Changed from "professional_development" to "practice"
       difficulty: "intermediate",
       created_at: new Date().toISOString(),
       user_id: "user-123",
@@ -36,7 +36,7 @@ const CourseGenerator = () => {
     {
       id: "dummy-course-2",
       title: "Python for Data Science",
-      purpose: "career_change",
+      purpose: "job_interview", // Changed from "career_change" to "job_interview"
       difficulty: "beginner",
       created_at: new Date(Date.now() - 86400000).toISOString(), // Yesterday
       user_id: "user-123",
@@ -45,7 +45,7 @@ const CourseGenerator = () => {
     {
       id: "dummy-course-3",
       title: "Advanced TypeScript",
-      purpose: "general_knowledge",
+      purpose: "other", // Changed from "general_knowledge" to "other"
       difficulty: "advanced",
       created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
       user_id: "user-123",
@@ -114,7 +114,7 @@ const CourseGenerator = () => {
       const newCourse = {
         id: courseId,
         title: generateCourseMutation.variables?.courseName || "New Course",
-        purpose: generateCourseMutation.variables?.purpose || "general_knowledge",
+        purpose: generateCourseMutation.variables?.purpose || "practice", // Changed default to "practice"
         difficulty: generateCourseMutation.variables?.difficulty || "beginner",
         created_at: new Date().toISOString(),
         user_id: user?.id || "guest-user",

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast as sonnerToast } from "sonner";
@@ -142,7 +141,7 @@ export const useCourseGeneration = () => {
         staticCourse = {
           title: topic,
           difficulty: difficulty,
-          summary: `This is a comprehensive course on ${topic} for ${purpose} at ${difficulty} level.`,
+          summary: `This is a comprehensive course on ${topic} for ${purpose} level.`,
           content: {
             parsedContent: {
               summary: `Welcome to ${topic} for ${difficulty} learners!`,
@@ -200,7 +199,7 @@ export const useCourseGeneration = () => {
       setProgress(90);
       
       // Extract the summary
-      const summary = staticCourse.summary || `Static course on ${topic} for ${purpose} at ${difficulty} level`;
+      const summary = staticCourse.summary || `Static course on ${topic} for ${purpose} level`;
       
       console.log(`Course ${courseId} updated with static/dummy content`);
       setProgress(100);

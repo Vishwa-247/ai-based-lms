@@ -13,7 +13,6 @@ import CourseForm from "@/components/course/CourseForm";
 import { useCourseGeneration } from "@/hooks/useCourseGeneration";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
-// Static questions based on job role
 const staticInterviewQuestions = {
   "Software Engineer": [
     "Tell me about your experience with software development methodologies like Agile or Scrum.",
@@ -112,7 +111,7 @@ const MockInterview = () => {
     {
       id: "course-dummy-1",
       title: "JavaScript Fundamentals",
-      purpose: "professional_development",
+      purpose: "practice",
       difficulty: "beginner",
       created_at: new Date().toISOString(),
       user_id: "user-123",
@@ -121,7 +120,7 @@ const MockInterview = () => {
     {
       id: "course-dummy-2",
       title: "Cloud Architecture",
-      purpose: "career_change",
+      purpose: "exam",
       difficulty: "advanced",
       created_at: new Date(Date.now() - 86400000).toISOString(),
       user_id: "user-123",
@@ -367,7 +366,7 @@ const MockInterview = () => {
         title: courseName,
         purpose: purpose,
         difficulty: difficulty,
-        summary: `A comprehensive course on ${courseName} designed for ${purpose.replace('_', ' ')} at ${difficulty} level.`,
+        summary: `A comprehensive course on ${courseName} designed for ${purpose} level.`,
         user_id: user?.id || "guest-user",
         created_at: new Date().toISOString(),
         content: { status: 'complete' }
