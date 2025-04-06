@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CourseType, ChapterType, FlashcardType, McqType, QnaType, MockInterviewType, InterviewQuestionType, InterviewAnalysisType } from '@/types';
 import { 
@@ -9,9 +10,11 @@ import {
 } from './flaskApi';
 import {
   generateCourseWithGemini,
+  generateFlashcardsWithGemini,
+  generateMCQsWithGemini,
+  generateQnAWithGemini,
   generateInterviewQuestionsWithGemini,
-  analyzeInterviewResponseWithGemini,
-  generateFlashcardsWithGemini
+  analyzeInterviewResponseWithGemini
 } from './geminiService';
 
 const fromTable = <T>(tableName: string) => {

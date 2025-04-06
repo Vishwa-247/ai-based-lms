@@ -170,6 +170,43 @@ export const generateQnAWithGemini = async (
 };
 
 /**
+ * Generate interview questions using the Gemini API
+ */
+export const generateInterviewQuestionsWithGemini = async (
+  jobRole: string,
+  techStack: string,
+  experience: string,
+  questionCount: number = 5
+): Promise<GeminiResponse> => {
+  const prompt = `Generate ${questionCount} technical interview questions for a ${experience} level ${jobRole} position with expertise in ${techStack}.
+                 Questions should be challenging but appropriate for the experience level.
+                 Format each question on a new line.`;
+  
+  return callGeminiApi<GeminiResponse>(prompt);
+};
+
+/**
+ * Analyze an interview response using the Gemini API
+ */
+export const analyzeInterviewResponseWithGemini = async (
+  jobRole: string,
+  question: string,
+  answer: string
+): Promise<GeminiResponse> => {
+  const prompt = `You are an expert technical interviewer for a ${jobRole} position.
+                 Analyze this candidate's answer and provide feedback:
+                 
+                 Question: ${question}
+                 
+                 Candidate's Answer: ${answer}
+                 
+                 Provide feedback on technical accuracy, completeness, clarity, and areas for improvement.
+                 Rate the answer on a scale of 1-10 and explain why.`;
+  
+  return callGeminiApi<GeminiResponse>(prompt);
+};
+
+/**
  * Fallback function for course generation when API fails
  */
 export const generateCourseFallback = async (
