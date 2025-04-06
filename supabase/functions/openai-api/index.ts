@@ -17,11 +17,18 @@ serve(async (req) => {
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     
     if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not set in environment variables');
+      console.error("OPENAI_API_KEY is not set in environment variables");
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'OpenAI API key is not configured. Please set it in the Supabase Edge Function secrets.'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const { action, prompt } = await req.json();
-    console.log(`Processing ${action} request with prompt:`, prompt.substring(0, 100) + "...");
+    console.log(`Processing ${action} request with prompt: ${prompt.substring(0, 100)}...`);
 
     // Set a timeout for the API call
     const controller = new AbortController();
@@ -53,7 +60,7 @@ serve(async (req) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error from OpenAI API:', errorText);
-        throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+        throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const responseData = await response.json();
@@ -63,6 +70,7 @@ serve(async (req) => {
       let text = '';
       try {
         text = responseData.choices[0].message.content || '';
+        console.log(`Extracted text (first 100 chars): ${text.substring(0, 100)}...`);
       } catch (extractError) {
         console.error('Error extracting text from response:', extractError);
       }
@@ -87,7 +95,7 @@ serve(async (req) => {
     console.error('Error in openai-api function:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: error.message || 'Unknown error during OpenAI API processing'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

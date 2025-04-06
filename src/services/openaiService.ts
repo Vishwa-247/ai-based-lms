@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -34,6 +33,10 @@ const callOpenAIApi = async <T>(prompt: string): Promise<T> => {
     
     if (!data) {
       throw new Error('Empty response from OpenAI Edge Function');
+    }
+    
+    if (!data.success) {
+      throw new Error(data.error || 'API returned unsuccessful response');
     }
     
     console.log(`Received response from OpenAI Edge Function`, data);
