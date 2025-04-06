@@ -72,6 +72,13 @@ const CourseGenerationStatus = ({
             <span>Failed</span>
           </div>
         );
+      case 'pending':
+        return (
+          <div className="flex items-center text-blue-500">
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            <span>Pending</span>
+          </div>
+        );
       default:
         return (
           <div className="flex items-center text-muted-foreground">

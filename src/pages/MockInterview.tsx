@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -126,21 +125,27 @@ const MockInterview = () => {
       setInterviewData(interview);
       console.log("Interview created:", interview);
 
-      // Using the OpenAI API directly instead of Flask API
-      const generatedData = await generateInterviewQuestionsWithGemini(
-        role,
-        techStack,
-        experience,
-        5
-      );
-
+      const { data: openAIResponse, error: invokeError } = await supabase.functions.invoke('openai-api', {
+        body: {
+          action: 'generate',
+          prompt: `Generate ${5} technical interview questions for a ${experience} level ${role} position with expertise in ${techStack}. 
+                  Questions should be challenging but appropriate for the experience level. 
+                  Format each question on a new line, and number them from 1 to ${5}.`
+        }
+      });
+      
+      if (invokeError) {
+        console.error("Error calling OpenAI Edge Function:", invokeError);
+        throw new Error(invokeError.message || "Error generating interview questions");
+      }
+      
       if (!isMounted.current) return;
       
-      console.log("Generated questions data:", generatedData);
+      console.log("Generated questions data:", openAIResponse);
       
       let questionList: string[] = [];
       try {
-        const text = generatedData.text;
+        const text = openAIResponse.text;
         questionList = text
           .split(/\d+\./)
           .map(q => q.trim())

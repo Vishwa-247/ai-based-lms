@@ -1,13 +1,14 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CourseType, ChapterType, FlashcardType, McqType, QnaType, MockInterviewType, InterviewQuestionType, InterviewAnalysisType } from '@/types';
 import {
-  generateCourseWithGemini,
-  generateFlashcardsWithGemini,
-  generateMCQsWithGemini,
-  generateQnAWithGemini,
-  generateInterviewQuestionsWithGemini,
-  analyzeInterviewResponseWithGemini
-} from './geminiService';
+  generateCourseWithOpenAI,
+  generateFlashcardsWithOpenAI,
+  generateMCQsWithOpenAI,
+  generateQnAWithOpenAI,
+  generateInterviewQuestionsWithOpenAI,
+  analyzeInterviewResponseWithOpenAI
+} from './openaiService';
 
 const fromTable = <T>(tableName: string) => {
   return (supabase as any).from(tableName);
@@ -409,7 +410,7 @@ export const generateCourseContent = async (
   difficulty: CourseType['difficulty']
 ) => {
   try {
-    return await generateCourseWithGemini(courseId, topic, purpose, difficulty);
+    return await generateCourseWithOpenAI(courseId, topic, purpose, difficulty);
   } catch (error) {
     console.error("Error generating course with OpenAI:", error);
     // Return a fallback response
@@ -431,7 +432,7 @@ export const generateInterviewQuestions = async (
   questionCount: number = 5
 ) => {
   try {
-    return await generateInterviewQuestionsWithGemini(jobRole, techStack, experience, questionCount);
+    return await generateInterviewQuestionsWithOpenAI(jobRole, techStack, experience, questionCount);
   } catch (error) {
     console.error("Error generating interview questions with OpenAI:", error);
     // Return a fallback response
@@ -452,7 +453,7 @@ export const analyzeInterviewResponse = async (
   answer: string
 ) => {
   try {
-    return await analyzeInterviewResponseWithGemini(jobRole, question, answer);
+    return await analyzeInterviewResponseWithOpenAI(jobRole, question, answer);
   } catch (error) {
     console.error("Error analyzing interview response with OpenAI:", error);
     
@@ -476,7 +477,7 @@ export const startCourseGeneration = async (
 ): Promise<void> => {
   try {
     // Call the OpenAI API to generate course content
-    await generateCourseWithGemini(courseId, topic, purpose, difficulty);
+    await generateCourseWithOpenAI(courseId, topic, purpose, difficulty);
     console.log("Course generation started for:", {courseId, topic, purpose, difficulty});
     return;
   } catch (error) {

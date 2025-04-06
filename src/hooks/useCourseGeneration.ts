@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast as sonnerToast } from "sonner";
 import { CourseType } from "@/types";
 import { 
-  generateCourseWithGemini, 
+  generateCourseWithOpenAI, 
   generateCourseFallback 
-} from "@/services/geminiService";
+} from "@/services/openaiService";
 
 // Define an interface for the content structure
 interface CourseContent {
@@ -190,13 +190,13 @@ export const useCourseGeneration = () => {
       console.log(`Updated course ${courseId} status to generating`);
       setProgress(30);
 
-      // Call Gemini API
-      console.log(`Calling Gemini API for course ${courseId}`);
+      // Call OpenAI API through Edge Function
+      console.log(`Calling OpenAI API for course ${courseId}`);
       
       try {
         const response = useFallback 
           ? await generateCourseFallback(topic, purpose, difficulty)
-          : await generateCourseWithGemini(courseId, topic, purpose, difficulty);
+          : await generateCourseWithOpenAI(courseId, topic, purpose, difficulty);
         
         if (!response.success) {
           // If API call failed but retries are available, try again
@@ -226,7 +226,7 @@ export const useCourseGeneration = () => {
             return processBackgroundCourseGeneration(topic, purpose, difficulty, courseId);
           }
           
-          throw new Error(response.error || 'Unknown error from Gemini API');
+          throw new Error(response.error || 'Unknown error from OpenAI API');
         }
         
         console.log(`Background generation completed successfully for course ${courseId}`);
@@ -236,7 +236,7 @@ export const useCourseGeneration = () => {
         const text = response.text || '';
         
         if (!text) {
-          throw new Error('Empty response from Gemini API');
+          throw new Error('Empty response from OpenAI API');
         }
         
         // Extract summary
@@ -267,7 +267,7 @@ export const useCourseGeneration = () => {
         console.log(`Course ${courseId} updated with generated content`);
         setProgress(100);
       } catch (error: any) {
-        console.error(`Error calling Gemini API: ${error.message}`);
+        console.error(`Error calling OpenAI API: ${error.message}`);
         throw error;
       }
       
@@ -339,7 +339,7 @@ export const useCourseGeneration = () => {
   ) => {
     // Implementation will be added in the future when needed
     console.log(`Generating ${contentType} for course ${courseId} on topic ${topic}`);
-    // This would call the appropriate Gemini API function based on contentType
+    // This would call the appropriate OpenAI API function based on contentType
   };
 
   return {
