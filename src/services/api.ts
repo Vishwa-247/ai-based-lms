@@ -1,13 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { CourseType, ChapterType, FlashcardType, McqType, QnaType, MockInterviewType, InterviewQuestionType, InterviewAnalysisType } from '@/types';
-import { 
-  generateCourseWithFlask, 
-  generateInterviewQuestionsWithFlask, 
-  generateFlashcardsWithFlask, 
-  summarizeTextWithFlask,
-  explainCodeWithFlask
-} from './flaskApi';
 import {
   generateCourseWithGemini,
   generateFlashcardsWithGemini,
@@ -408,7 +400,7 @@ export const analyzeFacialExpression = async (
 };
 
 /**
- * Generate a course using the Gemini API
+ * Generate a course using the OpenAI API
  */
 export const generateCourseContent = async (
   courseId: string,
@@ -419,14 +411,18 @@ export const generateCourseContent = async (
   try {
     return await generateCourseWithGemini(courseId, topic, purpose, difficulty);
   } catch (error) {
-    console.error("Error generating course with Gemini:", error);
-    // Fallback to Flask API if Gemini fails
-    return generateCourseWithFlask(topic, purpose, difficulty);
+    console.error("Error generating course with OpenAI:", error);
+    // Return a fallback response
+    return {
+      success: false,
+      error: "Failed to generate course content",
+      text: "Failed to generate course content. Please try again later."
+    };
   }
 };
 
 /**
- * Generate interview questions using the Gemini API
+ * Generate interview questions using the OpenAI API
  */
 export const generateInterviewQuestions = async (
   jobRole: string,
@@ -437,14 +433,18 @@ export const generateInterviewQuestions = async (
   try {
     return await generateInterviewQuestionsWithGemini(jobRole, techStack, experience, questionCount);
   } catch (error) {
-    console.error("Error generating interview questions with Gemini:", error);
-    // Fallback to Flask API if Gemini fails
-    return generateInterviewQuestionsWithFlask(jobRole, techStack, experience, questionCount);
+    console.error("Error generating interview questions with OpenAI:", error);
+    // Return a fallback response
+    return {
+      success: false,
+      error: "Failed to generate interview questions",
+      text: "Failed to generate interview questions. Please try again later."
+    };
   }
 };
 
 /**
- * Analyze an interview response using the Gemini API
+ * Analyze an interview response using the OpenAI API
  */
 export const analyzeInterviewResponse = async (
   jobRole: string,
@@ -454,19 +454,19 @@ export const analyzeInterviewResponse = async (
   try {
     return await analyzeInterviewResponseWithGemini(jobRole, question, answer);
   } catch (error) {
-    console.error("Error analyzing interview response with Gemini:", error);
+    console.error("Error analyzing interview response with OpenAI:", error);
     
-    // Fallback to a simple response if Gemini fails
+    // Fallback to a simple response if OpenAI fails
     return {
-      data: {
-        text: "An error occurred while analyzing the response. Please try again later."
-      }
+      success: false,
+      error: "Failed to analyze interview response",
+      text: "An error occurred while analyzing the response. Please try again later."
     };
   }
 };
 
 /**
- * Start course generation process using Supabase edge function
+ * Start course generation process
  */
 export const startCourseGeneration = async (
   courseId: string,
@@ -475,7 +475,7 @@ export const startCourseGeneration = async (
   difficulty: CourseType['difficulty']
 ): Promise<void> => {
   try {
-    // Call the Gemini API to generate course content
+    // Call the OpenAI API to generate course content
     await generateCourseWithGemini(courseId, topic, purpose, difficulty);
     console.log("Course generation started for:", {courseId, topic, purpose, difficulty});
     return;

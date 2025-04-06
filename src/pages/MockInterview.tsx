@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +12,7 @@ import { ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CourseForm from "@/components/course/CourseForm";
 import { supabase } from "@/integrations/supabase/client";
-import { generateInterviewQuestionsWithFlask, TextResponse } from "@/services/flaskApi";
+import { generateInterviewQuestionsWithGemini } from "@/services/geminiService";
 import { useCourseGeneration } from "@/hooks/useCourseGeneration";
 
 enum InterviewStage {
@@ -125,7 +126,8 @@ const MockInterview = () => {
       setInterviewData(interview);
       console.log("Interview created:", interview);
 
-      const generatedData = await generateInterviewQuestionsWithFlask(
+      // Using the OpenAI API directly instead of Flask API
+      const generatedData = await generateInterviewQuestionsWithGemini(
         role,
         techStack,
         experience,
