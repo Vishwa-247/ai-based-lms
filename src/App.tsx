@@ -15,6 +15,7 @@ import InterviewResult from "./pages/InterviewResult";
 import FutureIntegrations from "./pages/FutureIntegrations";
 import Auth from "./pages/Auth";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { InterviewProvider } from "./context/InterviewContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,7 +69,9 @@ const App = () => (
             <Route path="/mock-interview" element={
               <Layout>
                 <ProtectedRoute>
-                  <MockInterview />
+                  <InterviewProvider>
+                    <MockInterview />
+                  </InterviewProvider>
                 </ProtectedRoute>
               </Layout>
             } />
