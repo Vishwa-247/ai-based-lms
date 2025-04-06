@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Container from "@/components/ui/Container";
@@ -137,7 +137,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Email</FormLabel>
                               <FormControl>
-                                <Input placeholder="your.email@example.com" {...field} />
+                                <Input placeholder="Your email address" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -181,7 +181,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Full Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="John Doe" {...field} />
+                                <Input placeholder="Your full name" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -194,7 +194,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Email</FormLabel>
                               <FormControl>
-                                <Input placeholder="your.email@example.com" {...field} />
+                                <Input placeholder="Your email address" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

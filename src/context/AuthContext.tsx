@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
         }
         
-        // Get current session (but don't persist)
+        // Get current session (but don't persist) - we want users to log in each time
         const { data: { session } } = await supabase.auth.getSession();
         
         if (mounted && session) {
@@ -82,6 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               await syncUserProfile(id, fullName, email);
             }
           }
+        } else {
+          // Ensure we clear any existing session data
+          await supabase.auth.signOut();
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -108,6 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (id && email) {
               await syncUserProfile(id, fullName, email);
             }
+          }
+
+          // If the user signs out, clear session data
+          if (event === 'SIGNED_OUT') {
+            setSession(null);
+            setUser(null);
           }
         }
       }
@@ -158,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             full_name: fullName,
             role: 'user',
           }
-        },
+        }
       });
       
       if (error) throw error;
