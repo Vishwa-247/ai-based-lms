@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -10,9 +11,9 @@ import Container from "@/components/ui/Container";
 import { ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CourseForm from "@/components/course/CourseForm";
-import { useCourseGeneration } from "@/hooks/useCourseGeneration";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
+// Mock interview questions based on job role
 const staticInterviewQuestions = {
   "Software Engineer": [
     "Tell me about your experience with software development methodologies like Agile or Scrum.",
@@ -130,8 +131,6 @@ const MockInterview = () => {
   const [recordingComplete, setRecordingComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const isMounted = useRef(true);
-  
-  const { startCourseGeneration } = useCourseGeneration();
 
   useEffect(() => {
     isMounted.current = true;
@@ -356,10 +355,6 @@ const MockInterview = () => {
       });
 
       const courseId = crypto.randomUUID();
-      
-      if (user) {
-        await startCourseGeneration(courseName, purpose, difficulty, user.id);
-      }
       
       const newCourse = {
         id: courseId,
