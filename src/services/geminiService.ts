@@ -103,13 +103,41 @@ const callGeminiApi = async <T>(action: string, data: any): Promise<T> => {
                   - Question: [Question]
                   - Answer: [Answer]`;
         break;
+        
+      case 'generate_study_notes':
+        prompt = `You are an AI tutor. Generate detailed study notes on the topic: "${data.topic}"
+                 with the following difficulty level: ${data.difficulty}. Keep it beginner-friendly if easy, or deep and advanced if hard.
+                 Return in clean markdown format with headings, bullet points, and examples.`;
+        break;
+        
+      case 'generate_mcqs':
+        prompt = `Generate 10 multiple choice questions for "${data.topic}" with difficulty level "${data.difficulty}".
+                 Each question should have 4 options and clearly indicate the correct answer.
+                 Return in JSON format:
+                 [
+                   {
+                     "question": "...",
+                     "options": ["A", "B", "C", "D"],
+                     "answer": "A"
+                   },
+                   ...
+                 ]`;
+        break;
+        
+      case 'generate_qna':
+        prompt = `Generate a list of 10 potential questions and answers on the topic "${data.topic}".
+                 The questions should reflect real-world use cases and interview-style questions.
+                 Output format:
+                 Q: ...
+                 A: ...`;
+        break;
       
       default:
         prompt = `Please respond to: ${JSON.stringify(data)}`;
     }
     
     // API call to Gemini
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent", {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -230,6 +258,43 @@ export const generateFlashcardsWithGemini = async (
     topic,
     purpose,
     difficulty
+  });
+};
+
+/**
+ * Generate study notes using the Gemini API
+ */
+export const generateStudyNotesWithGemini = async (
+  topic: string,
+  difficulty: string
+): Promise<GeminiResponse> => {
+  return callGeminiApi<GeminiResponse>('generate_study_notes', {
+    topic,
+    difficulty
+  });
+};
+
+/**
+ * Generate multiple choice questions using the Gemini API
+ */
+export const generateMCQsWithGemini = async (
+  topic: string,
+  difficulty: string
+): Promise<GeminiResponse> => {
+  return callGeminiApi<GeminiResponse>('generate_mcqs', {
+    topic,
+    difficulty
+  });
+};
+
+/**
+ * Generate Q&A pairs using the Gemini API
+ */
+export const generateQnAWithGemini = async (
+  topic: string
+): Promise<GeminiResponse> => {
+  return callGeminiApi<GeminiResponse>('generate_qna', {
+    topic
   });
 };
 

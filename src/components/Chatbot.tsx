@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import GlassMorphism from "./ui/GlassMorphism";
-import { FLASK_API_URL } from "@/configs/environment";
+import { GEMINI_API_KEY } from "@/configs/environment";
 
 interface Message {
   id: string;
@@ -50,18 +50,32 @@ const Chatbot = () => {
     setIsLoading(true);
     
     try {
-      // Direct call to Flask API
-      const response = await fetch(`${FLASK_API_URL}/generate`, {
-        method: 'POST',
+      // Direct call to Gemini API
+      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          "x-goog-api-key": GEMINI_API_KEY
         },
         body: JSON.stringify({
-          action: 'custom_content',
-          prompt: `You are a helpful assistant for StudyMate, an AI-powered learning platform. 
-                  Answer the following question or request concisely and helpfully:
-                  ${input}`
-        }),
+          contents: [
+            {
+              parts: [
+                {
+                  text: `You are a helpful assistant for StudyMate, an AI-powered learning platform. 
+                         Answer the following question or request concisely and helpfully:
+                         ${input}`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
+          }
+        })
       });
       
       if (!response.ok) {
@@ -69,7 +83,7 @@ const Chatbot = () => {
       }
       
       const data = await response.json();
-      const botResponse = data.text || "I'm sorry, I couldn't process your request at the moment.";
+      const botResponse = data.candidates[0].content.parts[0].text || "I'm sorry, I couldn't process your request at the moment.";
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -85,7 +99,7 @@ const Chatbot = () => {
       // Fallback response in case of API error
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I'm sorry, I encountered an error while processing your request. Please try again later.",
+        content: "I'm sorry, I encountered an error while processing your request. Please check that your API key is valid and try again.",
         sender: "bot",
         timestamp: new Date()
       };

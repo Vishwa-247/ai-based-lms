@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast as sonnerToast } from "sonner";
 import { CourseType } from "@/types";
@@ -25,7 +24,6 @@ interface CourseContent {
 }
 
 export const useCourseGeneration = () => {
-  const navigate = useNavigate();
   const [generationInBackground, setGenerationInBackground] = useState(false);
   const [courseGenerationId, setCourseGenerationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +69,7 @@ export const useCourseGeneration = () => {
                 description: `Your course "${course.title}" has been generated successfully.`,
                 action: {
                   label: 'View Course',
-                  onClick: () => navigate(`/course/${course.id}`),
+                  onClick: () => window.location.href = `/course/${course.id}`,
                 },
               });
             } 
@@ -79,13 +77,6 @@ export const useCourseGeneration = () => {
             else if (content.status === 'generating_flashcards') {
               console.log("Generating additional flashcards for the course");
               setProgress(80); // Set progress to 80% when generating flashcards
-              
-              // Show a toast notification about the ongoing flashcards generation
-              if (content.message) {
-                sonnerToast.info('Enhancing Your Course', {
-                  description: content.message,
-                });
-              }
             }
             else if (content.status === 'generating') {
               // Simulate progress while in the generating state
@@ -121,7 +112,7 @@ export const useCourseGeneration = () => {
         clearInterval(intervalId);
       }
     };
-  }, [generationInBackground, courseGenerationId, navigate]);
+  }, [generationInBackground, courseGenerationId]);
 
   // Create a function to start course generation
   const startCourseGeneration = async (
@@ -165,7 +156,7 @@ export const useCourseGeneration = () => {
       setError(null);
       setProgress(20);
 
-      // Start the background process using Flask API for Gemini
+      // Start the background process
       processBackgroundCourseGeneration(
         courseName,
         purpose,
@@ -181,7 +172,7 @@ export const useCourseGeneration = () => {
     }
   };
 
-  // Background processing function to handle course generation with Flask API for Gemini
+  // Background processing function to handle course generation with direct Gemini API calls
   const processBackgroundCourseGeneration = async (
     topic: string,
     purpose: CourseType['purpose'],
@@ -200,8 +191,8 @@ export const useCourseGeneration = () => {
       console.log(`Updated course ${courseId} status to generating`);
       setProgress(30);
 
-      // Call Flask API for Gemini
-      console.log(`Calling Flask API for course ${courseId}`);
+      // Call Gemini API directly
+      console.log(`Calling Gemini API for course ${courseId}`);
       
       try {
         const response = useFallback 
@@ -277,7 +268,7 @@ export const useCourseGeneration = () => {
         console.log(`Course ${courseId} updated with generated content`);
         setProgress(100);
       } catch (error: any) {
-        console.error(`Error calling Flask API for Gemini: ${error.message}`);
+        console.error(`Error calling Gemini API: ${error.message}`);
         throw error;
       }
       
@@ -302,44 +293,6 @@ export const useCourseGeneration = () => {
       } catch (updateError: any) {
         console.error(`Failed to update error status for course ${courseId}:`, updateError);
       }
-    }
-  };
-
-  // Function to generate additional flashcards for an existing course
-  const generateAdditionalFlashcards = async (
-    courseId: string, 
-    topic: string,
-    purpose: CourseType['purpose'], 
-    difficulty: CourseType['difficulty']
-  ) => {
-    try {
-      console.log(`Generating additional flashcards for course ${courseId}`);
-      
-      // Update course status to indicate flashcard generation
-      await supabase
-        .from('courses')
-        .update({ 
-          content: { 
-            status: 'generating_flashcards', 
-            message: "Generating additional flashcards",
-            lastUpdated: new Date().toISOString() 
-          } 
-        })
-        .eq('id', courseId);
-      
-      // We can implement flashcard generation here if needed later
-      
-      sonnerToast.info('Enhancing Your Course', {
-        description: 'Generating additional flashcards for your course. This will happen in the background.',
-      });
-      
-      return true;
-    } catch (error: any) {
-      console.error("Error in generateAdditionalFlashcards:", error);
-      sonnerToast.error('Error', {
-        description: error.message || "Failed to generate additional flashcards",
-      });
-      return false;
     }
   };
 
@@ -444,7 +397,6 @@ export const useCourseGeneration = () => {
     error,
     progress,
     setError,
-    startCourseGeneration,
-    generateAdditionalFlashcards
+    startCourseGeneration
   };
 };
