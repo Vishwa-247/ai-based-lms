@@ -5,7 +5,7 @@ An AI-powered learning platform with course generation, flashcards, quizzes, and
 
 ## Environment Setup
 
-This application requires the following environment variables to be set:
+This application requires the following environment variable:
 
 ```
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
@@ -19,42 +19,72 @@ VITE_GEMINI_API_KEY=your_gemini_api_key_here
 
 ## Running the Application
 
+### Frontend Setup
+
 1. Clone the repository
 2. Install dependencies:
    ```bash
    npm install
    ```
-3. Create a `.env` file in the root directory and add the environment variables as described above
+3. Create a `.env` file in the root directory and add your Gemini API key:
+   ```
+   VITE_GEMINI_API_KEY=your_gemini_api_key_here
+   ```
 4. Start the application:
    ```bash
    npm run dev
    ```
-5. For the backend Flask API (optional but recommended):
+
+### Backend Setup (Flask API)
+
+The Flask API provides an additional interface to Gemini and handles complex operations:
+
+1. Navigate to the API directory:
    ```bash
    cd api
+   ```
+
+2. Install Python dependencies:
+   ```bash
    pip install flask flask-cors google-generativeai
+   ```
+
+3. Set your Gemini API key as an environment variable:
+   ```bash
+   # For Linux/Mac
    export GEMINI_API_KEY=your_gemini_api_key_here
+   
+   # For Windows
+   set GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
+4. Start the Flask API:
+   ```bash
    python flask_api.py
    ```
 
-## Supabase Setup
+## How Gemini API Calls Work
 
-This application uses Supabase for data storage and authentication:
+StudyMate uses the Gemini API in three ways:
 
-1. Make sure your Supabase project is running
-2. The application will automatically connect to your Supabase instance using the configured client
+### 1. Frontend Direct Calls (src/services/geminiService.ts)
+- Direct API calls from the frontend for simple operations
+- Used for immediate responses like answering questions in the chatbot
+- Uses the VITE_GEMINI_API_KEY environment variable
 
-## Features
+### 2. Flask API Integration (src/services/flaskApi.ts)
+- More complex processing with additional contextual information
+- Handles markdown formatting and parsing
+- Provides fallback mechanisms for API failures
 
-- AI-powered course generation
-- Interactive flashcards
-- Quiz system with MCQs
-- Mock interview preparation with AI feedback
-- Real-time progress tracking
+### 3. Supabase Edge Function (supabase/functions/gemini-api/index.ts)
+- Secure server-side processing for sensitive operations
+- Uses Supabase secrets for API key storage
+- Handles streaming responses and longer-running tasks
 
 ## Gemini API Prompts
 
-The application uses various prompts for different features. Here are the current prompts:
+The application uses various prompts for different features:
 
 ### Notes Generation Prompt
 ```javascript
@@ -137,21 +167,18 @@ Each course should have a name, short description, and difficulty level.
 ## Troubleshooting
 
 ### API Authentication Issues
-
 If you see a 403 error related to the Gemini API:
 1. Check that your `VITE_GEMINI_API_KEY` is correctly set in the `.env` file
 2. Make sure your API key is valid and has not expired
 3. Verify that you have enabled the Generative Language API in your Google Cloud Console
 
 ### Supabase Connection Issues
-
 If you experience issues with Supabase:
 1. Check that your Supabase URL and API key are correctly configured
 2. Ensure your database schema matches the expected structure
 3. Verify that Row Level Security (RLS) policies are correctly set up
 
 ### Edge Function Issues
-
 If edge functions aren't working:
 1. Make sure `GEMINI_API_KEY` is set in your Supabase secrets
 2. Check the edge function logs for any errors
