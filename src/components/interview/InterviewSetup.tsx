@@ -18,16 +18,12 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role.trim() || !techStack.trim()) {
-      toast({
-        title: "Missing information",
-        description: "Please enter both a job role and tech stack to start the interview.",
-        variant: "destructive",
-      });
-      return;
-    }
     
-    onSubmit(role, techStack, experience);
+    // Use default values if fields are empty
+    const finalRole = role.trim() || "Software Engineer";
+    const finalTechStack = techStack.trim() || "React, JavaScript";
+    
+    onSubmit(finalRole, finalTechStack, experience);
   };
 
   const experienceOptions = [
@@ -92,7 +88,7 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
               className="block text-sm font-medium text-foreground flex items-center gap-2"
             >
               <Briefcase size={16} />
-              Job Role <span className="text-red-500">*</span>
+              Job Role
             </label>
             <input
               id="role"
@@ -101,7 +97,6 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
               onChange={(e) => setRole(e.target.value)}
               placeholder="e.g., Software Engineer"
               className="w-full px-4 py-2 bg-white/20 dark:bg-black/20 border border-border rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none text-foreground"
-              required
             />
             <div className="pt-2 flex flex-wrap gap-2">
               {popularRoles.map((popularRole) => (
@@ -123,7 +118,7 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
               className="block text-sm font-medium text-foreground flex items-center gap-2"
             >
               <Code size={16} />
-              Tech Stack <span className="text-red-500">*</span>
+              Tech Stack
             </label>
             <input
               id="techStack"
@@ -132,7 +127,6 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
               onChange={(e) => setTechStack(e.target.value)}
               placeholder="e.g., React, Python"
               className="w-full px-4 py-2 bg-white/20 dark:bg-black/20 border border-border rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none text-foreground"
-              required
             />
             <div className="pt-2 flex flex-wrap gap-2">
               {popularTechStacks.map((stack) => (
@@ -176,12 +170,7 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
 
           <button
             type="submit"
-            disabled={isLoading || !role.trim() || !techStack.trim()}
-            className={`w-full px-4 py-2 text-white font-medium bg-primary rounded-lg transition-all ${
-              !role.trim() || !techStack.trim() || isLoading
-                ? "opacity-70 cursor-not-allowed"
-                : "hover:bg-primary/90"
-            }`}
+            className="w-full px-4 py-2 text-white font-medium bg-primary rounded-lg transition-all hover:bg-primary/90"
           >
             {isLoading ? "Setting Up..." : "Start Interview"}
           </button>

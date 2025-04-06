@@ -17,7 +17,7 @@ const ContentGenerationStatus = ({
   title, 
   startTime,
   progress,
-  estimatedTime = 10 // Reduced from 60 to 10 seconds
+  estimatedTime = 5 // Reduced from 10 to 5 seconds (faster)
 }: ContentGenerationStatusProps) => {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   
@@ -26,7 +26,7 @@ const ContentGenerationStatus = ({
       const interval = setInterval(() => {
         const seconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
         setElapsedTime(seconds);
-      }, 1000);
+      }, 500); // Update faster
       
       return () => clearInterval(interval);
     }
