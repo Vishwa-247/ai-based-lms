@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     console.log("OpenAI Edge function invoked");
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY') || "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";
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     
     if (!OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY is not set in environment variables');
