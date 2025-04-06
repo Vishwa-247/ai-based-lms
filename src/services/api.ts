@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { CourseType, ChapterType, FlashcardType, McqType, QnaType, MockInterviewType, InterviewQuestionType, InterviewAnalysisType } from '@/types';
 
@@ -225,6 +224,112 @@ const staticCourseData = {
         { question: "What is a service mesh?", answer: "A dedicated infrastructure layer for handling service-to-service communication for microservices-based applications" },
         { question: "What is the OWASP Top Ten?", answer: "A standard awareness document for developers and web application security that represents a broad consensus about the most critical security risks to web applications" },
         { question: "What is code splitting?", answer: "A feature that allows you to split your code into various bundles which can then be loaded on demand or in parallel" }
+      ]
+    }
+  },
+  "Python Programming": {
+    beginner: {
+      title: "Introduction to Python Programming",
+      chapters: [
+        { title: "Getting Started with Python", content: "Learn about Python's syntax, installation process, and basic programming concepts." },
+        { title: "Data Types and Variables", content: "Explore Python's built-in data types including strings, numbers, lists, tuples, and dictionaries." },
+        { title: "Control Flow: Conditionals", content: "Learn how to control program flow with if, elif, and else statements." },
+        { title: "Loops and Iterations", content: "Master different types of loops including for loops and while loops for repeating operations." },
+        { title: "Functions and Modules", content: "Learn how to create reusable blocks of code with functions and organize code into modules." }
+      ],
+      flashcards: [
+        { question: "What is Python?", answer: "Python is a high-level, interpreted programming language known for its readability and simplicity" },
+        { question: "What is a variable in Python?", answer: "A variable is a named location in memory used to store data that can be modified during program execution" },
+        { question: "What is the difference between a list and a tuple in Python?", answer: "Lists are mutable (can be changed after creation) while tuples are immutable (cannot be modified after creation)" },
+        { question: "How do you create a function in Python?", answer: "Functions are defined using the 'def' keyword, followed by the function name, parameters in parentheses, and a colon" },
+        { question: "What is an if-else statement in Python?", answer: "It's a control flow statement that executes different code blocks based on whether a condition evaluates to True or False" }
+      ]
+    },
+    intermediate: {
+      title: "Advanced Python Concepts",
+      chapters: [
+        { title: "Object-Oriented Programming", content: "Learn about classes, objects, inheritance, polymorphism, and encapsulation in Python." },
+        { title: "File Handling and I/O Operations", content: "Explore how to read from and write to files, handle errors, and work with different file formats." },
+        { title: "Exception Handling", content: "Master techniques for handling errors and exceptions to make your programs more robust." },
+        { title: "Functional Programming Features", content: "Learn about lambda functions, map, filter, reduce, and other functional programming tools in Python." },
+        { title: "Working with Libraries", content: "Explore popular Python libraries such as NumPy, Pandas, and Matplotlib for data manipulation and visualization." }
+      ],
+      flashcards: [
+        { question: "What is a class in Python?", answer: "A class is a blueprint for creating objects that define attributes and methods that will be shared by all instances" },
+        { question: "What is inheritance in Python?", answer: "Inheritance is a mechanism where a class can inherit attributes and methods from another class" },
+        { question: "What is a lambda function?", answer: "A lambda function is a small anonymous function defined using the 'lambda' keyword that can take any number of arguments but can only have one expression" },
+        { question: "What is the difference between 'append()' and 'extend()' in Python lists?", answer: "'append()' adds a single element to the end of a list, while 'extend()' adds all elements from an iterable to the end of the list" },
+        { question: "What is a decorator in Python?", answer: "A decorator is a design pattern that allows adding new functionality to objects without modifying their structure" }
+      ]
+    },
+    advanced: {
+      title: "Professional Python Development",
+      chapters: [
+        { title: "Concurrency and Parallelism", content: "Understand threading, multiprocessing, and asynchronous programming in Python." },
+        { title: "Design Patterns in Python", content: "Learn common design patterns and their implementation in Python for solving recurring problems." },
+        { title: "Testing and Debugging", content: "Master techniques for writing tests, debugging code, and ensuring code quality." },
+        { title: "Performance Optimization", content: "Learn strategies for profiling and optimizing Python code for better performance." },
+        { title: "Building Packages and Distribution", content: "Explore how to structure, package, and distribute Python applications." }
+      ],
+      flashcards: [
+        { question: "What is the Global Interpreter Lock (GIL) in Python?", answer: "The GIL is a mutex that protects access to Python objects, preventing multiple threads from executing Python bytecode at once" },
+        { question: "What is asyncio in Python?", answer: "Asyncio is a library for writing concurrent code using the async/await syntax, allowing asynchronous I/O operations" },
+        { question: "What is a context manager in Python?", answer: "A context manager is an object that defines the methods __enter__ and __exit__ to set up and clean up resources automatically" },
+        { question: "What is mocking in Python testing?", answer: "Mocking is a technique where you replace parts of your system under test with mock objects to isolate the behavior you want to test" },
+        { question: "What is the purpose of virtualenv?", answer: "Virtualenv is a tool to create isolated Python environments, allowing you to work on different projects with different dependencies" }
+      ]
+    }
+  },
+  "Web Security": {
+    beginner: {
+      title: "Introduction to Web Security",
+      chapters: [
+        { title: "Understanding the Web Security Landscape", content: "An overview of common web vulnerabilities and threats that affect modern web applications." },
+        { title: "Basic Authentication and Authorization", content: "Learn about user authentication methods and authorization models for securing web applications." },
+        { title: "Common Web Vulnerabilities", content: "Explore frequent security issues like XSS, CSRF, and SQL Injection and their impact." },
+        { title: "Security Headers and HTTPS", content: "Understand the importance of HTTPS and security headers in protecting web communication." },
+        { title: "Introduction to Web Application Firewalls", content: "Learn how WAFs can help protect web applications from various attacks." }
+      ],
+      flashcards: [
+        { question: "What is Cross-Site Scripting (XSS)?", answer: "A security vulnerability that allows attackers to inject malicious client-side scripts into web pages viewed by other users" },
+        { question: "What is HTTPS?", answer: "A protocol for secure communication over a computer network that encrypts data between the client and server" },
+        { question: "What is a CSRF attack?", answer: "Cross-Site Request Forgery is an attack that forces an authenticated user to execute unwanted actions on a web application they're logged into" },
+        { question: "What is SQL Injection?", answer: "A code injection technique that exploits vulnerabilities in web applications by inserting malicious SQL code into input fields" },
+        { question: "What is the Same-Origin Policy?", answer: "A security mechanism that restricts how documents or scripts loaded from one origin can interact with resources from another origin" }
+      ]
+    },
+    intermediate: {
+      title: "Applied Web Security Techniques",
+      chapters: [
+        { title: "Security in Modern Web Frameworks", content: "Learn about built-in security features and best practices in popular web frameworks." },
+        { title: "Advanced Authentication Systems", content: "Explore multi-factor authentication, OAuth, JWT, and other modern authentication approaches." },
+        { title: "Security Testing for Web Applications", content: "Learn methodologies and tools for identifying security vulnerabilities in web applications." },
+        { title: "Content Security Policy", content: "Understand how to implement and configure CSP to prevent XSS and other code injection attacks." },
+        { title: "API Security Best Practices", content: "Learn how to secure web APIs and protect against common API vulnerabilities." }
+      ],
+      flashcards: [
+        { question: "What is JWT (JSON Web Token)?", answer: "A compact, URL-safe means of representing claims between two parties, commonly used for authentication" },
+        { question: "What is Content Security Policy (CSP)?", answer: "A security layer that helps detect and mitigate certain types of attacks including XSS by restricting resource loading" },
+        { question: "What is OWASP?", answer: "The Open Web Application Security Project is a nonprofit foundation that works to improve software security" },
+        { question: "What is OAuth 2.0?", answer: "An authorization framework that enables a third-party application to obtain limited access to a service" },
+        { question: "What is CORS (Cross-Origin Resource Sharing)?", answer: "A mechanism that allows restricted resources on a web page to be requested from another domain outside the domain from which the first resource was served" }
+      ]
+    },
+    advanced: {
+      title: "Enterprise Web Security Strategies",
+      chapters: [
+        { title: "Secure Development Lifecycle", content: "Implementing security throughout the software development process using DevSecOps principles." },
+        { title: "Advanced Threat Protection", content: "Strategies for protecting against sophisticated attacks such as zero-day exploits and APTs." },
+        { title: "Security Monitoring and Incident Response", content: "Setting up monitoring systems and developing effective incident response plans for web applications." },
+        { title: "Penetration Testing Methodologies", content: "Advanced techniques for conducting thorough security assessments of web applications." },
+        { title: "Regulatory Compliance for Web Applications", content: "Understanding and implementing security controls required by standards like GDPR, PCI DSS, and HIPAA." }
+      ],
+      flashcards: [
+        { question: "What is DevSecOps?", answer: "A software development approach that integrates security practices within the DevOps process" },
+        { question: "What is a security bug bounty program?", answer: "A program where organizations reward individuals for reporting security vulnerabilities rather than exploiting them" },
+        { question: "What is an Advanced Persistent Threat (APT)?", answer: "A prolonged and targeted cyberattack where an attacker gains unauthorized access to a network and remains undetected for an extended period" },
+        { question: "What is a zero-day vulnerability?", answer: "A software security flaw that is unknown to the vendor and has no available patch" },
+        { question: "What is the principle of least privilege?", answer: "A security concept in which a user is given the minimum levels of access necessary to complete their job functions" }
       ]
     }
   }
