@@ -49,7 +49,7 @@ const CourseGenerationStatus = ({
         return (
           <div className="flex items-center text-amber-500">
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            <span>Generating with OpenAI</span>
+            <span>Generating with AI</span>
           </div>
         );
       case 'generating_flashcards':

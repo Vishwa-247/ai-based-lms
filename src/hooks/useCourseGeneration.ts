@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast as sonnerToast } from "sonner";
 import { CourseType } from "@/types";
+import { getStaticCourse } from "@/data/staticCourses";
 import { 
   generateCourseWithOpenAI, 
   generateCourseFallback 
@@ -28,6 +29,7 @@ export const useCourseGeneration = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [useFallback, setUseFallback] = useState(false);
   const [generationStartTime, setGenerationStartTime] = useState<Date | null>(null);
+  const [useStaticData, setUseStaticData] = useState(true); // Always use static data
 
   useEffect(() => {
     let intervalId: number | null = null;
@@ -156,18 +158,95 @@ export const useCourseGeneration = () => {
       setProgress(20);
 
       // Start the background process
-      processBackgroundCourseGeneration(
-        courseName,
-        purpose,
-        difficulty,
-        emptyCourse.id
-      );
+      if (useStaticData) {
+        // Simulate time for course generation
+        setTimeout(() => {
+          processStaticCourseGeneration(
+            courseName,
+            purpose,
+            difficulty as "beginner" | "intermediate" | "advanced",
+            emptyCourse.id
+          );
+        }, 120000); // 2 minutes of "generation time"
+      } else {
+        processBackgroundCourseGeneration(
+          courseName,
+          purpose,
+          difficulty,
+          emptyCourse.id
+        );
+      }
       
       return emptyCourse.id;
     } catch (error: any) {
       console.error("Error in startCourseGeneration:", error);
       setProgress(0);
       throw error;
+    }
+  };
+
+  // Process generation with static data
+  const processStaticCourseGeneration = async (
+    topic: string,
+    purpose: CourseType['purpose'],
+    difficulty: "beginner" | "intermediate" | "advanced",
+    courseId: string
+  ) => {
+    try {
+      setProgress(50);
+      
+      // Get static course data
+      const staticCourse = getStaticCourse(topic, difficulty);
+      
+      if (!staticCourse) {
+        throw new Error("No static course data available for this topic and difficulty");
+      }
+      
+      setProgress(70);
+      
+      // Extract the summary
+      const summary = staticCourse.summary || `Static course on ${topic} for ${purpose} at ${difficulty} level`;
+      
+      // Update course with static content
+      await supabase
+        .from('courses')
+        .update({ 
+          summary,
+          content: {
+            status: 'complete',
+            generatedAt: new Date().toISOString(),
+            parsedContent: staticCourse.content.parsedContent,
+            flashcards: staticCourse.content.flashcards || [],
+            mcqs: staticCourse.content.mcqs || [],
+            qnas: staticCourse.content.qnas || []
+          } 
+        })
+        .eq('id', courseId);
+        
+      console.log(`Course ${courseId} updated with static content`);
+      setProgress(100);
+      
+    } catch (error: any) {
+      console.error(`Error in static course generation for course ${courseId}:`, error);
+      setProgress(0);
+      
+      // Try to update the course with error status
+      try {
+        await supabase
+          .from('courses')
+          .update({ 
+            content: { 
+              status: 'error', 
+              message: error.message || 'Unknown error during static course generation',
+              lastUpdated: new Date().toISOString()
+            } 
+          })
+          .eq('id', courseId);
+          
+        console.log(`Updated course ${courseId} status to error due to processing error`);
+      } catch (updateError: any) {
+        console.error(`Failed to update error status for course ${courseId}:`, updateError);
+      }
     }
   };
 
