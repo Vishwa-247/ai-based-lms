@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Briefcase, Code, Clock, HelpCircle } from "lucide-react";
 import GlassMorphism from "../ui/GlassMorphism";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 interface InterviewSetupProps {
   onSubmit: (role: string, techStack: string, experience: string) => void;
@@ -13,12 +14,20 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
   const [role, setRole] = useState("");
   const [techStack, setTechStack] = useState("");
   const [experience, setExperience] = useState("1-3");
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (role.trim() && techStack.trim()) {
-      onSubmit(role, techStack, experience);
+    if (!role.trim() || !techStack.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter both a job role and tech stack to start the interview.",
+        variant: "destructive",
+      });
+      return;
     }
+    
+    onSubmit(role, techStack, experience);
   };
 
   const experienceOptions = [
