@@ -2,8 +2,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import GlassMorphism from "./ui/GlassMorphism";
-import { OPENAI_API_KEY } from "@/configs/environment";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -51,41 +51,24 @@ const Chatbot = () => {
     setIsLoading(true);
     
     try {
-      if (!OPENAI_API_KEY) {
-        throw new Error("OpenAI API key is not configured. Please add OPENAI_API_KEY to your .env file.");
-      }
-      
-      // Direct call to OpenAI API
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: `You are a helpful assistant for StudyMate, an AI-powered learning platform. 
-                       Answer the following question or request concisely and helpfully:`
-            },
-            {
-              role: "user",
-              content: input
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2048
-        })
+      // Call OpenAI via Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('openai-api', {
+        body: { 
+          action: 'generate',
+          prompt: `You are a helpful assistant for StudyMate, an AI-powered learning platform. 
+                  Answer the following question or request concisely and helpfully: ${input}`
+        }
       });
       
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      if (error) {
+        throw new Error(`API error: ${error.message}`);
       }
       
-      const data = await response.json();
-      const botResponse = data.choices[0].message.content || "I'm sorry, I couldn't process your request at the moment.";
+      if (!data.success) {
+        throw new Error(data.error || 'Unknown error occurred');
+      }
+      
+      const botResponse = data.text || "I'm sorry, I couldn't process your request at the moment.";
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -105,7 +88,7 @@ const Chatbot = () => {
       // Fallback response in case of API error
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I'm sorry, I encountered an error while processing your request. Please check that your API key is valid and try again.",
+        content: "I'm sorry, I encountered an error while processing your request. Please try again later.",
         sender: "bot",
         timestamp: new Date()
       };

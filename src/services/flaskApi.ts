@@ -1,5 +1,5 @@
 
-import { FLASK_API_URL, OPENAI_API_KEY } from "@/configs/environment";
+import { FLASK_API_URL } from "@/configs/environment";
 
 /**
  * Service for communicating with the Flask API for generation tasks
