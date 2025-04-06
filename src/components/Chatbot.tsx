@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import GlassMorphism from "./ui/GlassMorphism";
 import { GEMINI_API_KEY } from "@/configs/environment";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -50,6 +51,10 @@ const Chatbot = () => {
     setIsLoading(true);
     
     try {
+      if (!GEMINI_API_KEY) {
+        throw new Error("Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your .env file.");
+      }
+      
       // Direct call to Gemini API
       const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", {
         method: "POST",
@@ -93,8 +98,12 @@ const Chatbot = () => {
       };
       
       setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calling API:", error);
+      
+      toast.error("API Error", {
+        description: error.message || "Failed to get a response from the AI"
+      });
       
       // Fallback response in case of API error
       const errorMessage: Message = {
@@ -159,7 +168,7 @@ const Chatbot = () => {
           />
           <button
             type="submit"
-            className="p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            className="p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading || !input.trim()}
           >
             <Send size={18} />

@@ -16,9 +16,6 @@ interface CourseContent {
   parsedContent?: {
     summary?: string;
     chapters?: any[];
-    flashcards?: any[];
-    mcqs?: any[];
-    qnas?: any[];
   };
   [key: string]: any;
 }
@@ -30,6 +27,7 @@ export const useCourseGeneration = () => {
   const [progress, setProgress] = useState(0);
   const [retryCount, setRetryCount] = useState(0);
   const [useFallback, setUseFallback] = useState(false);
+  const [generationStartTime, setGenerationStartTime] = useState<Date | null>(null);
 
   useEffect(() => {
     let intervalId: number | null = null;
@@ -73,11 +71,7 @@ export const useCourseGeneration = () => {
                 },
               });
             } 
-            // Check if we're generating additional resources like flashcards
-            else if (content.status === 'generating_flashcards') {
-              console.log("Generating additional flashcards for the course");
-              setProgress(80); // Set progress to 80% when generating flashcards
-            }
+            // Check if we're generating content
             else if (content.status === 'generating') {
               // Simulate progress while in the generating state
               setProgress(prev => Math.min(prev + 5, 70)); // Increment progress up to 70%
@@ -124,10 +118,11 @@ export const useCourseGeneration = () => {
     try {
       console.log("Starting course generation for:", courseName);
       
-      // Reset progress
+      // Reset progress and set start time
       setProgress(10);
       setRetryCount(0);
       setUseFallback(false);
+      setGenerationStartTime(new Date());
       
       // Step 1: Create an empty course entry
       const { data: emptyCourse, error: courseError } = await supabase
@@ -138,7 +133,11 @@ export const useCourseGeneration = () => {
           difficulty,
           user_id: userId,
           summary: "Course generation in progress...",
-          content: { status: 'generating', lastUpdated: new Date().toISOString() }
+          content: { 
+            status: 'generating', 
+            lastUpdated: new Date().toISOString(),
+            startTime: new Date().toISOString()
+          }
         })
         .select()
         .single();
@@ -172,7 +171,7 @@ export const useCourseGeneration = () => {
     }
   };
 
-  // Background processing function to handle course generation with direct Gemini API calls
+  // Background processing function to handle course generation
   const processBackgroundCourseGeneration = async (
     topic: string,
     purpose: CourseType['purpose'],
@@ -191,7 +190,7 @@ export const useCourseGeneration = () => {
       console.log(`Updated course ${courseId} status to generating`);
       setProgress(30);
 
-      // Call Gemini API directly
+      // Call Gemini API
       console.log(`Calling Gemini API for course ${courseId}`);
       
       try {
@@ -200,7 +199,7 @@ export const useCourseGeneration = () => {
           : await generateCourseWithGemini(courseId, topic, purpose, difficulty);
         
         if (!response.success) {
-          // If API call failed but retries are available, try again after a short delay
+          // If API call failed but retries are available, try again
           if (retryCount < 2 && !useFallback) {
             setRetryCount(prev => prev + 1);
             console.log(`API call failed, retrying (${retryCount + 1}/3)...`);
@@ -289,7 +288,7 @@ export const useCourseGeneration = () => {
           })
           .eq('id', courseId);
           
-        console.log(`Updated course ${courseId} status to error due to background processing error`);
+        console.log(`Updated course ${courseId} status to error due to processing error`);
       } catch (updateError: any) {
         console.error(`Failed to update error status for course ${courseId}:`, updateError);
       }
@@ -300,10 +299,7 @@ export const useCourseGeneration = () => {
   const parseGeneratedContent = (text: string) => {
     const parsedContent = {
       summary: "",
-      chapters: [],
-      flashcards: [],
-      mcqs: [],
-      qnas: []
+      chapters: []
     };
 
     // Extract summary
@@ -331,64 +327,19 @@ export const useCourseGeneration = () => {
       });
     }
 
-    // Extract flashcards
-    const flashcardsSection = text.match(/# FLASHCARDS\s*\n([\s\S]*?)(?=\n# |$)/i);
-    if (flashcardsSection && flashcardsSection[1]) {
-      const flashcardsText = flashcardsSection[1];
-      const flashcardMatches = [...flashcardsText.matchAll(/- Question: ([\s\S]*?)- Answer: ([\s\S]*?)(?=\n- Question: |\n# |\n$)/g)];
-      
-      parsedContent.flashcards = flashcardMatches.map((match) => ({
-        question: match[1].trim(),
-        answer: match[2].trim()
-      }));
-    }
-
-    // Extract MCQs
-    const mcqsSection = text.match(/# MCQs[\s\S]*?(?:Multiple Choice Questions\)?)?\s*\n([\s\S]*?)(?=\n# |$)/i);
-    if (mcqsSection && mcqsSection[1]) {
-      const mcqsText = mcqsSection[1];
-      const mcqBlocks = mcqsText.split(/\n(?=- Question: )/g);
-      
-      parsedContent.mcqs = mcqBlocks.filter(block => block.includes('- Question:')).map(block => {
-        const questionMatch = block.match(/- Question: ([\s\S]*?)(?=\n- Options:|\n|$)/);
-        const optionsText = block.match(/- Options:\s*\n([\s\S]*?)(?=\n- Correct Answer:|\n|$)/);
-        const correctAnswerMatch = block.match(/- Correct Answer: ([a-d])/i);
-        
-        const question = questionMatch ? questionMatch[1].trim() : '';
-        
-        let options = [];
-        if (optionsText && optionsText[1]) {
-          options = optionsText[1]
-            .split(/\n\s*/)
-            .filter(line => /^[a-d]\)/.test(line))
-            .map(line => line.replace(/^[a-d]\)\s*/, '').trim());
-        }
-        
-        const correctAnswer = correctAnswerMatch ? 
-          options[correctAnswerMatch[1].charCodeAt(0) - 'a'.charCodeAt(0)] : 
-          '';
-        
-        return {
-          question,
-          options,
-          correct_answer: correctAnswer
-        };
-      });
-    }
-
-    // Extract Q&As
-    const qnasSection = text.match(/# Q&A PAIRS\s*\n([\s\S]*?)(?=\n# |$)/i);
-    if (qnasSection && qnasSection[1]) {
-      const qnasText = qnasSection[1];
-      const qnaMatches = [...qnasText.matchAll(/- Question: ([\s\S]*?)- Answer: ([\s\S]*?)(?=\n- Question: |\n# |\n$)/g)];
-      
-      parsedContent.qnas = qnaMatches.map((match) => ({
-        question: match[1].trim(),
-        answer: match[2].trim()
-      }));
-    }
-
     return parsedContent;
+  };
+
+  // Generate additional content (flashcards, MCQs, Q&As) separately
+  const generateAdditionalContent = async (
+    courseId: string,
+    contentType: 'flashcards' | 'mcqs' | 'qna',
+    topic: string,
+    difficulty?: string
+  ) => {
+    // Implementation will be added in the future when needed
+    console.log(`Generating ${contentType} for course ${courseId} on topic ${topic}`);
+    // This would call the appropriate Gemini API function based on contentType
   };
 
   return {
@@ -397,6 +348,8 @@ export const useCourseGeneration = () => {
     error,
     progress,
     setError,
-    startCourseGeneration
+    startCourseGeneration,
+    generateAdditionalContent,
+    generationStartTime
   };
 };

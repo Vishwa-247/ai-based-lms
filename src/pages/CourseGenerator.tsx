@@ -3,27 +3,26 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
 import Container from "@/components/ui/Container";
 import CourseForm from "@/components/course/CourseForm";
 import HowItWorks from "@/components/course/HowItWorks";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
+import ContentGenerationStatus from "@/components/course/ContentGenerationStatus";
 import { useAuth } from "@/context/AuthContext";
 import { toast as sonnerToast } from "sonner";
 import { useCourseGeneration } from "@/hooks/useCourseGeneration";
 import { CourseType } from "@/types";
 import { useMutation } from "@tanstack/react-query";
-import { Clock, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
 
 const CourseGenerator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [generationStartTime, setGenerationStartTime] = useState<Date | null>(null);
-  const [estimatedTime, setEstimatedTime] = useState<number>(60); // Default 60 seconds
   const [recentCourses, setRecentCourses] = useState<CourseType[]>([]);
   
   const { 
@@ -31,7 +30,8 @@ const CourseGenerator = () => {
     error, 
     progress,
     setError, 
-    startCourseGeneration 
+    startCourseGeneration,
+    generationStartTime
   } = useCourseGeneration();
 
   useEffect(() => {
@@ -58,23 +58,7 @@ const CourseGenerator = () => {
     }
   };
 
-  // Calculate remaining time
-  const getRemainingTime = () => {
-    if (!generationStartTime) return 0;
-    
-    const elapsed = Math.floor((Date.now() - generationStartTime.getTime()) / 1000);
-    const remaining = Math.max(0, estimatedTime - elapsed);
-    return remaining;
-  };
-
-  // Format time in minutes and seconds
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  // Use React Query for mutations to manage loading and error states automatically
+  // Use React Query for mutations
   const generateCourseMutation = useMutation({
     mutationFn: async ({
       courseName, 
@@ -89,23 +73,11 @@ const CourseGenerator = () => {
         throw new Error("Authentication required");
       }
       
-      // Start the timer when generation begins
-      setGenerationStartTime(new Date());
-      
-      // Set estimated time based on complexity
-      if (difficulty === 'advanced') {
-        setEstimatedTime(120); // 2 minutes for advanced courses
-      } else if (difficulty === 'intermediate') {
-        setEstimatedTime(90); // 1.5 minutes for intermediate courses
-      } else {
-        setEstimatedTime(60); // 1 minute for beginner courses
-      }
-      
       return startCourseGeneration(courseName, purpose, difficulty, user.id);
     },
     onSuccess: (courseId) => {
       sonnerToast.info('Course Generation Started', {
-        description: 'Your course is being generated in the background with advanced flashcards and interactive elements. You can continue browsing the site.',
+        description: 'Your course is being generated in the background with notes. You can continue browsing the site.',
         duration: 6000,
       });
       
@@ -163,14 +135,13 @@ const CourseGenerator = () => {
     generateCourseMutation.mutate({ courseName, purpose, difficulty });
   };
 
-  const remainingTime = getRemainingTime();
-
   return (
     <Container className="py-12">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight mb-2">Course Generator</h1>
         <p className="text-muted-foreground max-w-2xl">
           Create customized courses on any topic with our AI-powered course generator.
+          Only notes will be generated initially - you can add flashcards, MCQs, and Q&A later.
         </p>
       </div>
 
@@ -181,33 +152,13 @@ const CourseGenerator = () => {
         </Alert>
       )}
 
-      {generationInBackground && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Generating your course...
-            </CardTitle>
-            <CardDescription>
-              This process takes approximately {formatTime(estimatedTime)} to complete.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Progress value={progress} className="h-2" />
-              <div className="flex items-center justify-between text-sm">
-                <span>{progress}% complete</span>
-                {remainingTime > 0 && (
-                  <div className="flex items-center text-muted-foreground">
-                    <Clock className="h-3.5 w-3.5 mr-1" />
-                    <span>Estimated {formatTime(remainingTime)} remaining</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <ContentGenerationStatus
+        isGenerating={generationInBackground}
+        title="Generating your course notes..."
+        startTime={generationStartTime}
+        progress={progress}
+        estimatedTime={120}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
@@ -265,7 +216,7 @@ const CourseGenerator = () => {
       <LoadingOverlay 
         isLoading={isLoading}
         message="Starting Course Generation"
-        subMessage="We're preparing your course. Once started, you can navigate away and we'll notify you when it's ready."
+        subMessage="We're preparing your course notes. Once started, you can navigate away and we'll notify you when it's ready."
       />
     </Container>
   );

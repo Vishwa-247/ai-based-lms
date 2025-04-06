@@ -44,87 +44,15 @@ StudyMate uses direct calls to the Gemini API from the frontend:
 - The application uses the VITE_GEMINI_API_KEY environment variable for authentication
 - A fallback mechanism exists for generating content when API calls fail
 
-## Gemini API Prompts
+## Course Generation Process
 
-The application uses various prompts for different features:
+The course generation happens in the background:
 
-### Notes Generation Prompt
-```javascript
-prompt = `
-You are an AI tutor. Generate detailed study notes on the topic: "${topic}"
-with the following difficulty level: ${difficulty}. Keep it beginner-friendly if easy, or deep and advanced if hard.
-Return in clean markdown format with headings, bullet points, and examples.
-`;
-```
-
-### Flashcards Prompt
-```javascript
-prompt = `
-Generate 10 flashcards for the topic "${topic}".
-Each flashcard should be in the format:
-Q: Question here?
-A: Answer here.
-Target difficulty: ${difficulty}.
-`;
-```
-
-### MCQs Prompt
-```javascript
-prompt = `
-Generate 10 multiple choice questions for "${topic}" with difficulty level "${difficulty}".
-Each question should have 4 options and clearly indicate the correct answer.
-Return in JSON format:
-[
-  {
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "answer": "A"
-  },
-  ...
-]
-`;
-```
-
-### Q&A Prompt
-```javascript
-prompt = `
-Generate a list of 10 potential questions and answers on the topic "${topic}".
-The questions should reflect real-world use cases and interview-style questions.
-Output format:
-Q: ...
-A: ...
-`;
-```
-
-### Communication Feedback Prompt (Interview)
-```javascript
-prompt = `
-You are a communication skill evaluator. Analyze the following response from a user during a mock interview:
-
-"${userResponse}"
-
-Evaluate it based on:
-1. Clarity of thought
-2. Speaking structure
-3. Use of filler words
-4. Grammar
-5. Confidence
-
-Give feedback and suggestions for improvement. Return a communication score out of 10.
-`;
-```
-
-### Course Suggestion Based on Communication
-```javascript
-prompt = `
-Based on the communication analysis below, suggest 3 AI-generated micro-courses to improve the user's speaking or soft skills:
-
-Analysis:
-"${feedback}"
-
-Each course should have a name, short description, and difficulty level.
-`;
-```
+1. When a user submits a request, it creates an entry in the database with "generating" status
+2. The application shows a progress indicator with an estimated time remaining
+3. Initially, only course notes are generated
+4. Additional content like flashcards, MCQs, and Q&A sections can be generated separately after the course is created
+5. All generation runs in the background, allowing users to navigate away from the page
 
 ## Troubleshooting
 
@@ -133,6 +61,12 @@ If you see a 403 error related to the Gemini API:
 1. Check that your `VITE_GEMINI_API_KEY` is correctly set in the `.env` file
 2. Make sure your API key is valid and has not expired
 3. Verify that you have enabled the Generative Language API in your Google Cloud Console
+
+### Browser Extension Conflicts
+If you experience message channel errors:
+1. Try disabling browser extensions, especially ad blockers or privacy tools
+2. Refresh the page and try again
+3. If the issue persists in one browser, try another browser
 
 ### Supabase Connection Issues
 If you experience issues with Supabase:
