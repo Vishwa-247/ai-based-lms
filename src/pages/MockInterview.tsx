@@ -11,7 +11,7 @@ import { ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CourseForm from "@/components/course/CourseForm";
 import { supabase } from "@/integrations/supabase/client";
-import { generateInterviewQuestionsWithGemini } from "@/services/geminiService";
+import { generateInterviewQuestionsWithOpenAI } from "@/services/openaiService";
 import { useCourseGeneration } from "@/hooks/useCourseGeneration";
 
 enum InterviewStage {
