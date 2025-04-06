@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useReducer, useEffect, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { InterviewQuestionType, MockInterviewType, CourseType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -79,10 +79,10 @@ interface InterviewContextType {
   // Actions
   setStage: (stage: InterviewStage) => void;
   setCourseTabActive: (active: boolean) => void;
-  handleInterviewSetup: (role: string, techStack: string, experience: string) => Promise<void>;
+  handleInterviewSetup: (role: string, techStack: string, experience: string) => void;
   handleAnswerSubmitted: (blob: Blob) => void;
   handleNextQuestion: () => void;
-  handleSubmitCourse: (courseName: string, purpose: CourseType['purpose'], difficulty: CourseType['difficulty']) => Promise<void>;
+  handleSubmitCourse: (courseName: string, purpose: CourseType['purpose'], difficulty: CourseType['difficulty']) => void;
   startRecording: () => void;
   stopRecording: () => void;
   handleCancel: () => void;
@@ -108,7 +108,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isRecording, setIsRecording] = useState(false);
   const [recentInterviews, setRecentInterviews] = useState<MockInterviewType[]>([
     {
-      id: "interview-dummy-1",
+      id: "mock-001",
       job_role: "Software Engineer",
       tech_stack: "React, Node.js",
       experience: "3-5",
@@ -117,19 +117,19 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       created_at: new Date().toISOString()
     },
     {
-      id: "interview-dummy-2",
-      job_role: "Frontend Developer",
-      tech_stack: "React, TypeScript",
-      experience: "1-3",
+      id: "mock-002",
+      job_role: "Full Stack Developer",
+      tech_stack: "React, Node.js, MongoDB, Express",
+      experience: "2-4",
       user_id: "user-123",
-      completed: false,
+      completed: true,
       created_at: new Date(Date.now() - 86400000).toISOString()
     },
     {
-      id: "interview-dummy-3",
-      job_role: "DevOps Engineer",
-      tech_stack: "AWS, Docker, Kubernetes",
-      experience: "5+",
+      id: "mock-003",
+      job_role: "Data Engineer",
+      tech_stack: "Python, SQL, Spark, AWS",
+      experience: "3-5",
       user_id: "user-123",
       completed: true,
       created_at: new Date(Date.now() - 172800000).toISOString()
@@ -166,14 +166,12 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, []);
 
-  const handleInterviewSetup = async (role: string, techStack: string, experience: string) => {
+  const handleInterviewSetup = (role: string, techStack: string, experience: string) => {
     setIsLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       const newInterview = {
-        id: crypto.randomUUID(),
+        id: `mock-${crypto.randomUUID().split('-')[0]}`,
         job_role: role || "Software Engineer",
         tech_stack: techStack || "React, Node.js",
         experience,
@@ -210,7 +208,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.error("Error setting up interview:", error);
       
       const defaultInterview = {
-        id: crypto.randomUUID(),
+        id: `mock-${crypto.randomUUID().split('-')[0]}`,
         job_role: "Software Engineer",
         tech_stack: "JavaScript, React",
         experience: "1-3",
@@ -245,11 +243,9 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const fetchInterviewQuestions = async (interviewId: string) => {
+  const fetchInterviewQuestions = (interviewId: string) => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       const interview = recentInterviews.find(i => i.id === interviewId);
       if (!interview) {
         throw new Error("Interview not found");
@@ -298,12 +294,10 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const handleAnswerSubmitted = async (blob: Blob) => {
+  const handleAnswerSubmitted = (blob: Blob) => {
     if (!interviewData || !questions[currentQuestionIndex]) return;
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
       const updatedQuestions = [...questions];
       updatedQuestions[currentQuestionIndex] = {
         ...updatedQuestions[currentQuestionIndex],
@@ -328,7 +322,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const handleNextQuestion = async () => {
+  const handleNextQuestion = () => {
     setRecordingComplete(false);
     
     if (currentQuestionIndex < questions.length - 1) {
@@ -336,7 +330,6 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setStage(InterviewStage.Questions);
     } else {
       setStage(InterviewStage.Complete);
-      setIsProcessing(true);
       
       if (interviewData) {
         try {
@@ -354,25 +347,17 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             description: "Your interview has been completed. Preparing your results...",
           });
           
-          setTimeout(() => {
-            if (isMounted.current) {
-              navigate(`/interview-result/${interviewData.id}`);
-            }
-          }, 1500);
+          // Navigate immediately without any loading delay
+          navigate(`/interview-result/${interviewData.id}`);
         } catch (error) {
           console.error("Error updating interview status:", error);
-          
-          setTimeout(() => {
-            if (isMounted.current) {
-              navigate(`/interview-result/${interviewData.id}`);
-            }
-          }, 1500);
+          navigate(`/interview-result/${interviewData.id}`);
         }
       }
     }
   };
 
-  const handleSubmitCourse = async (courseName: string, purpose: CourseType['purpose'], difficulty: CourseType['difficulty']) => {
+  const handleSubmitCourse = (courseName: string, purpose: CourseType['purpose'], difficulty: CourseType['difficulty']) => {
     setIsGeneratingCourse(true);
     
     try {
@@ -396,16 +381,13 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       setRecentCourses(prev => [newCourse as CourseType, ...prev]);
       
-      setTimeout(() => {
-        if (isMounted.current) {
-          toast({
-            title: "Course Generated",
-            description: "Your course has been successfully generated!",
-          });
-          
-          navigate(`/course/${courseId}`);
-        }
-      }, 1500);
+      // Navigate immediately without loading state
+      toast({
+        title: "Course Generated",
+        description: "Your course has been successfully generated!",
+      });
+      
+      navigate(`/course/${courseId}`);
     } catch (error) {
       console.error("Error creating course:", error);
       
@@ -421,16 +403,12 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       setRecentCourses(prev => [fallbackCourse as CourseType, ...prev]);
       
-      setTimeout(() => {
-        if (isMounted.current) {
-          toast({
-            title: "Course Generated",
-            description: "Your course has been generated with example content.",
-          });
-          
-          navigate(`/course/${fallbackCourse.id}`);
-        }
-      }, 1500);
+      toast({
+        title: "Course Generated",
+        description: "Your course has been generated with example content.",
+      });
+      
+      navigate(`/course/${fallbackCourse.id}`);
     } finally {
       if (isMounted.current) {
         setIsGeneratingCourse(false);

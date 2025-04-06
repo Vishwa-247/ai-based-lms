@@ -9,131 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Video, MessageSquare, BarChart, CheckCircle, XCircle, AlertCircle, ArrowRight, BookOpen } from "lucide-react";
-
-// Define static mock interview data
-const mockInterviewData = {
-  id: "mock-001",
-  title: "Software Engineer Interview (React)",
-  date: "2023-05-15",
-  duration: "32 minutes",
-  overallScore: 78,
-  jobRole: "Frontend Developer",
-  techStack: ["React", "TypeScript", "Node.js"],
-  experience: "3-5 years",
-  feedback: {
-    technical: {
-      score: 82,
-      strengths: [
-        "Strong understanding of React component lifecycle",
-        "Good knowledge of state management patterns",
-        "Clear explanation of frontend performance optimization"
-      ],
-      weaknesses: [
-        "Some gaps in TypeScript advanced types knowledge",
-        "Limited understanding of modern build tools",
-        "Could improve on system design explanations"
-      ],
-      summary: "Your technical knowledge is solid, especially in React fundamentals and state management. Focus on improving your TypeScript skills and expanding your knowledge of modern build tools and system design principles."
-    },
-    communication: {
-      score: 75,
-      strengths: [
-        "Clear articulation of complex concepts",
-        "Good pacing and tone throughout the interview",
-        "Effective use of examples to illustrate points"
-      ],
-      weaknesses: [
-        "Occasionally used vague terminology",
-        "Some responses could be more concise",
-        "A few instances of filler words that reduced clarity"
-      ],
-      summary: "Your communication is generally strong, with good articulation and pacing. Work on being more precise with technical terminology and reducing filler words to increase the impact of your responses."
-    },
-    nonVerbal: {
-      score: 70,
-      strengths: [
-        "Maintained good eye contact",
-        "Appropriate facial expressions",
-        "Professional demeanor throughout"
-      ],
-      weaknesses: [
-        "Occasional fidgeting indicated nervousness",
-        "Body posture could be more confident",
-        "Hand gestures sometimes distracting"
-      ],
-      summary: "Your non-verbal communication was professional, with good eye contact. Focus on reducing nervous fidgeting and adopting a more confident posture to enhance your presence."
-    }
-  },
-  questions: [
-    {
-      question: "Explain the virtual DOM and how it improves performance in React.",
-      answer: "The virtual DOM is a lightweight copy of the actual DOM. When state changes in a React application, React first updates the virtual DOM, compares it with the previous version (diffing), and then only updates the actual DOM with the necessary changes. This approach is more efficient than directly manipulating the DOM for every state change because DOM operations are expensive. By batching and optimizing these updates, React significantly improves performance, especially in complex applications with frequent state changes.",
-      feedback: "Good explanation of the virtual DOM concept and its performance benefits. You could strengthen the answer by mentioning specific examples of when this optimization matters most, such as in components that re-render frequently.",
-      score: 85
-    },
-    {
-      question: "How would you handle state management in a large React application?",
-      answer: "For large React applications, I would implement a state management solution that scales well. Context API is good for simpler applications or for state that doesn't change frequently. For more complex applications, I'd use Redux or Zustand. I prefer Redux when we need strong guarantees about state updates, middleware support, and a well-established ecosystem. I'd structure the store using the ducks pattern or feature-based organization. For server state, I'd integrate React Query to handle caching, background updates, and synchronization.",
-      feedback: "Strong answer showing awareness of different state management approaches and their trade-offs. Good mention of React Query for server state management. Consider discussing how you would determine which state belongs in global store versus component-local state.",
-      score: 90
-    },
-    {
-      question: "Describe TypeScript's type system and how it helps prevent bugs.",
-      answer: "TypeScript adds static typing to JavaScript, allowing developers to define types for variables, function parameters, return values, and more. It helps prevent bugs by catching type-related errors during development rather than at runtime. Features like interfaces, generics, and union types provide powerful ways to describe complex data structures. The type system also enhances developer experience through better autocomplete and documentation.",
-      feedback: "Your explanation covers the basics well, but lacks depth on advanced TypeScript features. Consider expanding your knowledge of conditional types, mapped types, and the utility types that TypeScript provides. Also, specific examples of bugs that TypeScript prevents would strengthen this answer.",
-      score: 65
-    }
-  ],
-  recommendations: [
-    {
-      title: "Advanced TypeScript Patterns",
-      type: "course",
-      reason: "To address gaps in TypeScript knowledge identified during the interview",
-      link: "/course/ts-advanced"
-    },
-    {
-      title: "System Design for Frontend Engineers",
-      type: "course",
-      reason: "To improve understanding of frontend architecture and system design principles",
-      link: "/course/fe-system-design"
-    },
-    {
-      title: "Technical Communication Skills",
-      type: "practice",
-      reason: "To work on more precise and concise communication of technical concepts",
-      link: "/mock-interview?focus=communication"
-    }
-  ],
-  videoAnalysis: {
-    confidenceScore: 72,
-    engagementScore: 85,
-    stressIndicators: 40,
-    timeline: [
-      { time: "00:02:15", note: "Increased confidence when discussing familiar topics", score: 80 },
-      { time: "00:08:40", note: "Signs of stress when addressing TypeScript questions", score: 55 },
-      { time: "00:15:20", note: "Strong engagement and eye contact during system design explanation", score: 90 },
-      { time: "00:22:10", note: "Fidgeting observed during challenging questions", score: 60 },
-      { time: "00:28:35", note: "Confident closing statements and questions", score: 85 }
-    ]
-  }
-};
-
-// Create a function to get interview data based on ID
-const getInterviewData = (id: string) => {
-  // In a real app, this would fetch data from an API
-  // For now, just return the static data with the given ID
-  return {
-    ...mockInterviewData,
-    id
-  };
-};
+import { getInterviewData } from "@/data/mockInterviewData";
 
 const InterviewResult = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("feedback");
 
-  // Get interview data based on ID
-  const interviewData = getInterviewData(id || 'default');
+  // Get interview data based on ID from our static data file
+  const interviewData = getInterviewData(id || "default");
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-500";
