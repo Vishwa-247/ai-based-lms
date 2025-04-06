@@ -124,11 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ 
         email, 
-        password,
-        options: {
-          // Don't persist session
-          persistSession: false
-        }
+        password
       });
       
       if (error) throw error;
@@ -161,9 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: {
             full_name: fullName,
             role: 'user',
-          },
-          // Don't persist session
-          persistSession: false
+          }
         },
       });
       
