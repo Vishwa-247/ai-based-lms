@@ -24,131 +24,89 @@ serve(async (req) => {
     const { action, data } = await req.json();
     console.log(`Processing ${action} request with data:`, data);
 
-    let endpoint = '';
-    let requestBody = {};
+    let prompt = "";
+    let endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+    let generationConfig = {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 8192,
+    };
 
     switch (action) {
       case 'generate_course':
-        endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-        requestBody = {
-          contents: [{
-            parts: [{
-              text: `Create a complete course on ${data.topic} for ${data.purpose} at ${data.difficulty} level.
-                     
-                     Follow this exact structure:
-                     
-                     # SUMMARY
-                     Provide a concise overview of what the course covers and its objectives.
-                     
-                     # CHAPTERS
-                     Create 5-8 logically structured chapters. For each chapter:
-                     - Title: Clear and descriptive chapter title
-                     - Content: Detailed and comprehensive content with examples, explanations, and relevant concepts
-                     
-                     # FLASHCARDS
-                     Create at least 15 flashcards in this format:
-                     - Question: [question text]
-                     - Answer: [answer text]
-                     
-                     # MCQs (Multiple Choice Questions)
-                     Create at least 10 multiple choice questions in this format:
-                     - Question: [question text]
-                     - Options: 
-                       a) [option text]
-                       b) [option text]
-                       c) [option text]
-                       d) [option text]
-                     - Correct Answer: [correct letter]
-                     
-                     # Q&A PAIRS
-                     Create at least 10 question and answer pairs for deeper understanding:
-                     - Question: [detailed question]
-                     - Answer: [comprehensive answer]
-                     
-                     Make sure the entire course is educational, accurate, and provides comprehensive knowledge on ${data.topic}. Adapt the content to be appropriate for ${data.purpose} at ${data.difficulty} level.`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 8192,
-          }
-        };
+        prompt = `Create a complete course on ${data.topic} for ${data.purpose} at ${data.difficulty} level.
+                 
+                 Follow this exact structure:
+                 
+                 # SUMMARY
+                 Provide a concise overview of what the course covers and its objectives.
+                 
+                 # CHAPTERS
+                 Create 5-8 logically structured chapters. For each chapter:
+                 ## [Chapter Title]
+                 [Chapter Content with detailed and comprehensive content including examples, explanations, and relevant concepts]
+                 
+                 # FLASHCARDS
+                 Create at least 15 flashcards in this format:
+                 - Question: [question text]
+                 - Answer: [answer text]
+                 
+                 # MCQs (Multiple Choice Questions)
+                 Create at least 10 multiple choice questions in this format:
+                 - Question: [question text]
+                 - Options: 
+                 a) [option text] 
+                 b) [option text] 
+                 c) [option text] 
+                 d) [option text]
+                 - Correct Answer: [correct letter]
+                 
+                 # Q&A PAIRS
+                 Create at least 10 question and answer pairs for deeper understanding:
+                 - Question: [detailed question]
+                 - Answer: [comprehensive answer]
+                 
+                 Ensure the course is educational, accurate, and tailored to ${data.purpose} at ${data.difficulty} level.`;
         break;
 
       case 'generate_interview_questions':
-        endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-        requestBody = {
-          contents: [{
-            parts: [{
-              text: `Generate ${data.questionCount || 5} interview questions for a ${data.experience} years experienced ${data.jobRole} 
-                     with expertise in ${data.techStack}. The questions should be challenging and relevant to the role.
-                     
-                     For each question:
-                     1. Focus on both technical knowledge and practical application
-                     2. Include questions that test problem-solving abilities
-                     3. Add questions about handling specific scenarios they might encounter
-                     4. Include questions about their approach to teamwork and collaboration
-                     
-                     Format the response as a numbered list with just the questions.`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048,
-          }
-        };
+        prompt = `Generate ${data.questionCount || 5} interview questions for a ${data.experience} years experienced ${data.jobRole} 
+                 with expertise in ${data.techStack}. The questions should be challenging and relevant to the role.
+                 
+                 For each question:
+                 1. Focus on technical knowledge and practical application
+                 2. Test problem-solving abilities
+                 3. Include scenario-based questions
+                 4. Assess teamwork and collaboration skills
+                 Format as a numbered list.`;
+        generationConfig.maxOutputTokens = 2048;
         break;
 
       case 'analyze_interview':
-        endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-        requestBody = {
-          contents: [{
-            parts: [{
-              text: `Analyze this interview response for a ${data.jobRole} position. 
-                     Question: ${data.question}
-                     Answer: ${data.answer}
-                     
-                     Provide detailed analysis in the following format:
-                     
-                     Technical Feedback: (Analyze understanding of technical concepts and accuracy)
-                     Communication Feedback: (Analyze clarity, structure, and language used)
-                     Strengths: (List 3 specific strengths in the response)
-                     Areas to Improve: (List 3 specific areas that could be improved)
-                     Overall Rating: (Give a rating between 0-100)`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 2048,
-          }
-        };
+        prompt = `Analyze this interview response for a ${data.jobRole} position. \n
+                 Question: ${data.question}\n
+                 Answer: ${data.answer}\n\n
+                 Provide detailed analysis in the following format:\n\n
+                 Technical Feedback: (Analyze understanding of technical concepts and accuracy)\n
+                 Communication Feedback: (Analyze clarity, structure, and language used)\n
+                 Strengths: (List 3 specific strengths in the response)\n
+                 Areas to Improve: (List 3 specific areas that could be improved)\n
+                 Overall Rating: (Give a rating between 0-100)`;
+        generationConfig.temperature = 0.3;
+        generationConfig.maxOutputTokens = 2048;
         break;
 
       case 'generate_flashcards':
-        endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-        requestBody = {
-          contents: [{
-            parts: [{
-              text: `Generate 20 detailed flashcards on the topic: ${data.topic} for ${data.purpose} at ${data.difficulty} level.
-                     
-                     Create flashcards in this exact format:
-                     
-                     # FLASHCARDS
-                     - Question: [Specific, clear question text]
-                     - Answer: [Comprehensive, accurate answer text]
-                     
-                     Make sure the flashcards cover key concepts, terms, principles, and applications related to the topic.
-                     Each answer should be detailed enough to provide complete understanding.
-                     Ensure varying difficulty levels across the flashcards to test different aspects of knowledge.`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4096,
-          }
-        };
+        prompt = `Generate 20 detailed flashcards on the topic: ${data.topic} for ${data.purpose} at ${data.difficulty} level.\n
+                 Create flashcards in this exact format:\n\n
+                 # FLASHCARDS\n
+                 - Question: [Specific, clear question text]\n
+                 - Answer: [Comprehensive, accurate answer text]\n\n
+                 Make sure the flashcards cover key concepts, terms, principles, and applications related to the topic.\n
+                 Each answer should be detailed enough to provide complete understanding.\n
+                 Ensure varying difficulty levels across the flashcards to test different aspects of knowledge.`;
+        generationConfig.maxOutputTokens = 4096;
         break;
 
       default:
@@ -167,7 +125,14 @@ serve(async (req) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig
+        }),
         signal: controller.signal
       });
       
@@ -182,9 +147,24 @@ serve(async (req) => {
       const responseData = await response.json();
       console.log(`Gemini API response received successfully for ${action}`);
       
+      // Extract the text from the response
+      let text = '';
+      try {
+        if (responseData.candidates && 
+            responseData.candidates[0] && 
+            responseData.candidates[0].content && 
+            responseData.candidates[0].content.parts && 
+            responseData.candidates[0].content.parts[0]) {
+          text = responseData.candidates[0].content.parts[0].text || '';
+        }
+      } catch (extractError) {
+        console.error('Error extracting text from response:', extractError);
+      }
+      
       return new Response(JSON.stringify({
         success: true,
-        data: responseData
+        data: responseData,
+        text: text // Include the extracted text
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

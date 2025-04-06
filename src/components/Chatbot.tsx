@@ -65,7 +65,7 @@ const Chatbot = () => {
       });
       
       if (!response.ok) {
-        throw new Error(`Flask API error: ${response.status}`);
+        throw new Error(`API error: ${response.status}`);
       }
       
       const data = await response.json();
@@ -80,7 +80,7 @@ const Chatbot = () => {
       
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error("Error calling Flask API:", error);
+      console.error("Error calling API:", error);
       
       // Fallback response in case of API error
       const errorMessage: Message = {
@@ -113,7 +113,7 @@ const Chatbot = () => {
                   : "bg-white/10 dark:bg-black/10"
               }`}
             >
-              <p>{message.content}</p>
+              <p className="whitespace-pre-wrap">{message.content}</p>
               <p className="text-xs opacity-70 mt-1">
                 {message.timestamp.toLocaleTimeString([], {
                   hour: "2-digit",

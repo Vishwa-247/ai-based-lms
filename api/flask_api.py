@@ -18,13 +18,19 @@ def generate():
         data = request.json
         action = data.get('action')
         request_data = data.get('data', {})
+        
+        # Handle direct prompts for flexibility
+        custom_prompt = data.get('prompt')
 
-        if not action:
-            return jsonify({"success": False, "error": "No action specified"}), 400
+        if not action and not custom_prompt:
+            return jsonify({"success": False, "error": "No action or prompt specified"}), 400
 
         prompt = ""
 
-        if action == 'generate_course':
+        if custom_prompt:
+            # Use the provided prompt directly
+            prompt = custom_prompt
+        elif action == 'generate_course':
             prompt = (f"Create a complete course on {request_data['topic']} for {request_data['purpose']} at {request_data['difficulty']} level.\n\n"
                      f"Follow this exact structure:\n\n"
                      f"# SUMMARY\nProvide a concise overview of what the course covers and its objectives.\n\n"
@@ -74,12 +80,16 @@ def generate():
                      f"Each answer should be detailed enough to provide complete understanding.\n"
                      f"Ensure varying difficulty levels across the flashcards to test different aspects of knowledge.")
         
+        elif action == 'custom_content':
+            prompt = data.get('prompt', '')
+            if not prompt:
+                return jsonify({"success": False, "error": "No prompt provided for custom_content action"}), 400
+        
         else:
             return jsonify({"success": False, "error": f"Unsupported action: {action}"}), 400
         
         try:
-            # Generate content using the Gemini model - fix the API call format
-            # The correct way to call the Gemini model
+            # Generate content using the Gemini model
             response = model.generate_content(prompt)
             
             # Format the response to match the expected format
@@ -87,7 +97,7 @@ def generate():
 
             return jsonify({
                 "success": True, 
-                "text": response_text  # Return the text property explicitly
+                "text": response_text
             }), 200
             
         except Exception as e:
