@@ -5,14 +5,25 @@ interface LoadingOverlayProps {
   isLoading: boolean;
   message?: string;
   subMessage?: string;
+  minimal?: boolean;
 }
 
 const LoadingOverlay = ({ 
   isLoading, 
   message = "Processing", 
-  subMessage = "Please wait while we process your request." 
+  subMessage = "Please wait while we process your request.",
+  minimal = false
 }: LoadingOverlayProps) => {
   if (!isLoading) return null;
+  
+  if (minimal) {
+    return (
+      <div className="fixed top-4 right-4 bg-card p-3 rounded-lg shadow-lg z-50 flex items-center space-x-2">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span className="text-sm font-medium">{message}</span>
+      </div>
+    );
+  }
   
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">

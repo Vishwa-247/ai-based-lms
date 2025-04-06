@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,21 +121,6 @@ const Dashboard = () => {
           </Card>
         ))}
       </div>
-
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-72" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Skeleton className="h-10 w-40" />
-            <Skeleton className="h-10 w-40" />
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 
@@ -201,11 +185,9 @@ const Dashboard = () => {
             <TabsTrigger value="interviews">Interviews</TabsTrigger>
           </TabsList>
 
-          {isLoading ? (
-            <LoadingSkeleton />
-          ) : error ? (
-            <ErrorDisplay />
-          ) : (
+          {isLoading && <LoadingSkeleton />}
+          {error && <ErrorDisplay />}
+          {!isLoading && !error && (
             <>
               <TabsContent value="overview" className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -213,11 +213,14 @@ const CourseGenerator = () => {
         </div>
       )}
 
-      <LoadingOverlay 
-        isLoading={isLoading}
-        message="Starting Course Generation"
-        subMessage="We're preparing your course notes. Once started, you can navigate away and we'll notify you when it's ready."
-      />
+      {isLoading && (
+        <LoadingOverlay 
+          isLoading={true}
+          message="Starting Course Generation"
+          subMessage="We're preparing your course notes. Once started, you can navigate away and we'll notify you when it's ready."
+          minimal={true}
+        />
+      )}
     </Container>
   );
 };

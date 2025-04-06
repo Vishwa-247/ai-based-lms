@@ -88,6 +88,9 @@ const CourseGenerationStatus = ({
     }
   };
   
+  // Skip rendering if status is not provided
+  if (!status) return null;
+  
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-3">
@@ -112,19 +115,20 @@ const CourseGenerationStatus = ({
             </div>
           )}
           
-          <div className="mt-4">
-            <Button 
-              variant={status === 'complete' ? "default" : "outline"}
-              size="sm"
-              className="w-full"
-              disabled={status !== 'complete'}
-              asChild
-            >
-              <Link to={`/course/${courseId}`}>
-                {status === 'complete' ? 'View Course' : 'Processing...'}
-              </Link>
-            </Button>
-          </div>
+          {status === 'complete' && (
+            <div className="mt-4">
+              <Button 
+                variant="default"
+                size="sm"
+                className="w-full"
+                asChild
+              >
+                <Link to={`/course/${courseId}`}>
+                  View Course
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
