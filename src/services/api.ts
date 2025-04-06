@@ -1,5 +1,19 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CourseType, ChapterType, FlashcardType, McqType, QnaType, MockInterviewType, InterviewQuestionType, InterviewAnalysisType } from '@/types';
+
+// Define the StudyMaterial type that's missing
+export interface StudyMaterial {
+  id: number;
+  course_id: string;
+  course_type: string;
+  topic: string;
+  difficulty_level: string;
+  created_by: string;
+  status: string;
+  course_layout?: any;
+  created_at: string;
+}
 
 const staticCourseData = {
   "Network Security": {
@@ -613,9 +627,14 @@ export const generateCourseContent = async (
   difficulty: CourseType['difficulty']
 ) => {
   try {
-    return await generateCourseWithOpenAI(courseId, topic, purpose, difficulty);
+    // Use static data instead of OpenAI
+    console.log("Using static data instead of OpenAI for course generation");
+    return {
+      success: true,
+      text: `# SUMMARY\nThis is a generated course on ${topic} for ${purpose} at ${difficulty} level.\n\n# CHAPTERS\n## Introduction\nIntroduction to the topic.\n\n## Core Concepts\nDiscussion of core concepts.\n\n## Advanced Applications\nExploration of advanced applications.`
+    };
   } catch (error) {
-    console.error("Error generating course with OpenAI:", error);
+    console.error("Error generating course content:", error);
     return {
       success: false,
       error: "Failed to generate course content",
@@ -631,9 +650,28 @@ export const generateInterviewQuestions = async (
   questionCount: number = 5
 ) => {
   try {
-    return await generateInterviewQuestionsWithOpenAI(jobRole, techStack, experience, questionCount);
+    // Use static data instead of OpenAI
+    console.log("Using static data instead of OpenAI for interview questions");
+    
+    const questions = [
+      `Explain your experience with ${techStack} and how you've used it in previous projects.`,
+      `What are the main design patterns you apply when working with ${techStack}?`,
+      `How would you implement error handling in a ${jobRole} position using ${techStack}?`,
+      `Describe a challenging problem you solved using ${techStack} and your approach to solving it.`,
+      `How do you keep up with the latest developments in ${techStack} and related technologies?`,
+      `What testing methodologies do you use for ${techStack} applications?`,
+      `How would you optimize the performance of a ${techStack} application?`
+    ];
+    
+    const selectedQuestions = questions.slice(0, questionCount);
+    
+    return {
+      success: true,
+      text: selectedQuestions.join('\n\n'),
+      data: selectedQuestions
+    };
   } catch (error) {
-    console.error("Error generating interview questions with OpenAI:", error);
+    console.error("Error generating interview questions:", error);
     return {
       success: false,
       error: "Failed to generate interview questions",
@@ -648,9 +686,34 @@ export const analyzeInterviewResponse = async (
   answer: string
 ) => {
   try {
-    return await analyzeInterviewResponseWithOpenAI(jobRole, question, answer);
+    // Use static data instead of OpenAI
+    console.log("Using static data instead of OpenAI for interview analysis");
+    
+    let rating = Math.floor(Math.random() * 4) + 6; // Random rating between 6 and 9
+    
+    const feedback = `
+      Your answer demonstrated a good understanding of the core concepts related to ${jobRole}. 
+      
+      Strengths:
+      - Clear articulation of key points
+      - Good technical knowledge of the subject matter
+      - Logical structure in your explanation
+      
+      Areas for improvement:
+      - Could provide more specific examples from your experience
+      - Consider discussing alternative approaches to the problem
+      - Dive deeper into the performance implications of your solution
+      
+      Overall rating: ${rating}/10
+    `;
+    
+    return {
+      success: true,
+      text: feedback.trim(),
+      data: { rating, feedback: feedback.trim() }
+    };
   } catch (error) {
-    console.error("Error analyzing interview response with OpenAI:", error);
+    console.error("Error analyzing interview response:", error);
     
     return {
       success: false,
