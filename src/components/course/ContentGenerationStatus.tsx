@@ -17,7 +17,7 @@ const ContentGenerationStatus = ({
   title, 
   startTime,
   progress,
-  estimatedTime = 60
+  estimatedTime = 10 // Reduced from 60 to 10 seconds
 }: ContentGenerationStatusProps) => {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   

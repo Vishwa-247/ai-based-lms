@@ -16,7 +16,7 @@ const LoadingOverlay = ({
   message = "Processing", 
   subMessage = "Please wait while we process your request.",
   minimal = false,
-  autoDismiss,
+  autoDismiss = 10000, // Default auto-dismiss to 10 seconds
   onDismissed
 }: LoadingOverlayProps) => {
   const [visible, setVisible] = useState(isLoading);
@@ -24,7 +24,7 @@ const LoadingOverlay = ({
   useEffect(() => {
     setVisible(isLoading);
     
-    if (isLoading && autoDismiss) {
+    if (isLoading) {
       const timer = setTimeout(() => {
         setVisible(false);
         if (onDismissed) onDismissed();

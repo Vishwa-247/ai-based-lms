@@ -79,7 +79,7 @@ const InterviewSetup = ({ onSubmit, isLoading = false }: InterviewSetupProps) =>
             <li><strong>Click "Start Interview"</strong> - Begin your practice session</li>
           </ol>
           <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md text-sm">
-            <span className="font-medium">Note:</span> For the best experience, try using one of the suggested job roles like "Software Engineer" or "Frontend Developer" with their matching tech stacks.
+            <span className="font-medium">Note:</span> Interviews start quickly (within 10 seconds) with pre-defined questions based on your selection.
           </div>
         </CardContent>
       </Card>

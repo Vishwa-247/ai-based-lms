@@ -30,6 +30,7 @@ export const useCourseGeneration = () => {
     if (generationInBackground && courseGenerationId) {
       console.log("Setting up interval to check course generation status for ID:", courseGenerationId);
       
+      // Speed up the course generation progress checks - check every 1 second instead of 3
       intervalId = window.setInterval(async () => {
         try {
           console.log("Checking course generation status for ID:", courseGenerationId);
@@ -68,8 +69,8 @@ export const useCourseGeneration = () => {
             } 
             // Check if we're generating content
             else if (content.status === 'generating') {
-              // Simulate progress while in the generating state
-              setProgress(prev => Math.min(prev + 5, 70)); // Increment progress up to 70%
+              // Faster progress simulation
+              setProgress(prev => Math.min(prev + 15, 90)); // Increment progress much faster
             }
             // Check if there was an error in generation
             else if (content.status === 'error') {
@@ -92,7 +93,7 @@ export const useCourseGeneration = () => {
           setProgress(0);
           setError("Failed to check course generation status. Please try again.");
         }
-      }, 3000);
+      }, 1000); // Reduced from 3000ms to 1000ms for faster updates
     }
     
     return () => {
@@ -114,7 +115,7 @@ export const useCourseGeneration = () => {
       console.log("Starting static course generation for:", courseName);
       
       // Reset progress and set start time
-      setProgress(10);
+      setProgress(25); // Start at higher progress value
       setGenerationStartTime(new Date());
       
       // Step 1: Create an empty course entry
@@ -146,10 +147,10 @@ export const useCourseGeneration = () => {
       setCourseGenerationId(emptyCourse.id);
       setGenerationInBackground(true);
       setError(null);
-      setProgress(20);
+      setProgress(40);
 
       // Start the background process with static data
-      // Simulate time for course generation
+      // Speed up course generation from 5s to just 1s for faster response
       setTimeout(() => {
         processStaticCourseGeneration(
           courseName,
@@ -157,7 +158,7 @@ export const useCourseGeneration = () => {
           difficulty as "beginner" | "intermediate" | "advanced",
           emptyCourse.id
         );
-      }, 5000); // 5 seconds of "generation time" for better user experience
+      }, 1000); // Reduced from 5000ms to 1000ms for much faster generation
       
       return emptyCourse.id;
     } catch (error: any) {
@@ -175,7 +176,7 @@ export const useCourseGeneration = () => {
     courseId: string
   ) => {
     try {
-      setProgress(50);
+      setProgress(70);
       
       // Get static course data
       const staticCourse = getStaticCourse(topic, difficulty);
@@ -184,7 +185,7 @@ export const useCourseGeneration = () => {
         throw new Error("No static course data available for this topic and difficulty");
       }
       
-      setProgress(70);
+      setProgress(90);
       
       // Extract the summary
       const summary = staticCourse.summary || `Static course on ${topic} for ${purpose} at ${difficulty} level`;
