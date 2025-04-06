@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import GlassMorphism from "./ui/GlassMorphism";
-import { GEMINI_API_KEY } from "@/configs/environment";
+import { OPENAI_API_KEY } from "@/configs/environment";
 import { toast } from "sonner";
 
 interface Message {
@@ -51,35 +51,32 @@ const Chatbot = () => {
     setIsLoading(true);
     
     try {
-      if (!GEMINI_API_KEY) {
-        throw new Error("Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your .env file.");
+      if (!OPENAI_API_KEY) {
+        throw new Error("OpenAI API key is not configured. Please add OPENAI_API_KEY to your .env file.");
       }
       
-      // Direct call to Gemini API
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", {
+      // Direct call to OpenAI API
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": GEMINI_API_KEY
+          "Authorization": `Bearer ${OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-          contents: [
+          model: "gpt-4o-mini",
+          messages: [
             {
-              parts: [
-                {
-                  text: `You are a helpful assistant for StudyMate, an AI-powered learning platform. 
-                         Answer the following question or request concisely and helpfully:
-                         ${input}`
-                }
-              ]
+              role: "system",
+              content: `You are a helpful assistant for StudyMate, an AI-powered learning platform. 
+                       Answer the following question or request concisely and helpfully:`
+            },
+            {
+              role: "user",
+              content: input
             }
           ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048,
-          }
+          temperature: 0.7,
+          max_tokens: 2048
         })
       });
       
@@ -88,7 +85,7 @@ const Chatbot = () => {
       }
       
       const data = await response.json();
-      const botResponse = data.candidates[0].content.parts[0].text || "I'm sorry, I couldn't process your request at the moment.";
+      const botResponse = data.choices[0].message.content || "I'm sorry, I couldn't process your request at the moment.";
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
