@@ -73,6 +73,9 @@ const Dashboard = () => {
     </Card>
   );
 
+  // Fix: Replace the line with error by checking if both displayCourses and displayInterviews are empty
+  const showWelcomeCard = displayCourses.length === 0 && displayInterviews.length === 0;
+
   return (
     <Container>
       <div className="py-8">
@@ -242,7 +245,7 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            {courses.length === 0 && interviews.length === 0 && <WelcomeCard />}
+            {showWelcomeCard && <WelcomeCard />}
           </TabsContent>
 
           <TabsContent value="courses">
