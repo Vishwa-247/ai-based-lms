@@ -86,8 +86,8 @@ const CourseGenerator = () => {
     },
     onSuccess: (courseId) => {
       sonnerToast.info('Course Generation Started', {
-        description: 'Your course is being generated. You can continue browsing the site.',
-        duration: 3000,
+        description: 'Your course is being generated. This process will take about 3 minutes.',
+        duration: 5000,
       });
       
       // Add the newly created course to the recent courses list
@@ -145,7 +145,7 @@ const CourseGenerator = () => {
     
     toast({
       title: "Starting Course Generation",
-      description: "This process will continue in the background. You can navigate to other pages.",
+      description: "This process will continue in the background and take about 3 minutes. You can navigate to other pages.",
     });
     
     // Use the mutation to handle the API call
@@ -174,7 +174,7 @@ const CourseGenerator = () => {
         title="Generating your course notes..."
         startTime={generationStartTime}
         progress={progress}
-        estimatedTime={5} // Very fast generation
+        estimatedTime={180} // 3 minutes in seconds
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -234,7 +234,7 @@ const CourseGenerator = () => {
         <LoadingOverlay 
           isLoading={true}
           message="Starting Course Generation"
-          subMessage="We're preparing your course notes. Once started, you can navigate away and we'll notify you when it's ready."
+          subMessage="We're preparing your course notes. This will take about 3 minutes. Once started, you can navigate away and we'll notify you when it's ready."
           minimal={true}
           autoDismiss={3000} // Auto dismiss after 3 seconds
         />

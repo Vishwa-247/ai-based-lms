@@ -17,7 +17,7 @@ const ContentGenerationStatus = ({
   title, 
   startTime,
   progress,
-  estimatedTime = 5 // Reduced from 10 to 5 seconds (faster)
+  estimatedTime = 180 // 3 minutes = 180 seconds
 }: ContentGenerationStatusProps) => {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   
@@ -26,14 +26,14 @@ const ContentGenerationStatus = ({
       const interval = setInterval(() => {
         const seconds = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
         setElapsedTime(seconds);
-      }, 500); // Update faster
+      }, 1000);
       
       return () => clearInterval(interval);
     }
   }, [isGenerating, startTime]);
   
   const getRemainingTime = () => {
-    if (!startTime) return 0;
+    if (!startTime) return estimatedTime;
     const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
     const remaining = Math.max(0, estimatedTime - elapsed);
     return remaining;

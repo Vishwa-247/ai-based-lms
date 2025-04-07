@@ -30,35 +30,36 @@ export const useCourseGeneration = () => {
     if (generationInBackground && courseGenerationId) {
       console.log("Setting up interval to check course generation status for ID:", courseGenerationId);
       
-      // Speed up the course generation progress checks - check every 500ms
+      // Show loader for 3 minutes (180000 ms) with gradual progress updates
+      const startTime = Date.now();
+      const totalDuration = 180000; // 3 minutes in milliseconds
+      
       intervalId = window.setInterval(() => {
-        // Simulate fast progress
-        setProgress(prev => {
-          const newProgress = prev + 25; // Much faster progress
+        const elapsed = Date.now() - startTime;
+        
+        // Calculate progress as a percentage of the 3 minutes
+        const newProgress = Math.min(Math.round((elapsed / totalDuration) * 100), 99);
+        
+        setProgress(newProgress);
+        
+        // If 3 minutes have passed, complete the process
+        if (elapsed >= totalDuration) {
+          // Course is complete
+          setProgress(100);
           
-          if (newProgress >= 100) {
-            // Course is complete
-            if (intervalId) clearInterval(intervalId);
-            setGenerationInBackground(false);
-            setCourseGenerationId(null);
-            
-            // Notify user of completion
-            setTimeout(() => {
-              sonnerToast.success('Course Generation Complete', {
-                description: `Your course has been generated successfully.`,
-                action: {
-                  label: 'View Course',
-                  onClick: () => window.location.href = `/course/${courseGenerationId}`,
-                },
-              });
-            }, 500);
-            
-            return 100;
-          }
+          if (intervalId) clearInterval(intervalId);
+          setGenerationInBackground(false);
           
-          return newProgress;
-        });
-      }, 500); // Super fast 500ms updates
+          // Notify user of completion
+          sonnerToast.success('Course Generation Complete', {
+            description: `Your course has been generated successfully.`,
+            action: {
+              label: 'View Course',
+              onClick: () => window.location.href = `/course/${courseGenerationId}`,
+            },
+          });
+        }
+      }, 1000); // Update every second for smoother progress
     }
     
     return () => {
@@ -80,7 +81,7 @@ export const useCourseGeneration = () => {
       console.log("Starting course generation for:", courseName);
       
       // Reset progress and set start time
-      setProgress(25);
+      setProgress(0);
       setGenerationStartTime(new Date());
       
       // Create a random course ID
@@ -94,7 +95,7 @@ export const useCourseGeneration = () => {
       // Simulate course creation in database
       console.log(`Created course with ID: ${courseId}`);
       
-      // Always succeed with static data
+      // Process with static data after the 3-minute loading period completes
       setTimeout(() => {
         processStaticCourseGeneration(
           courseName,
@@ -102,7 +103,7 @@ export const useCourseGeneration = () => {
           difficulty as "beginner" | "intermediate" | "advanced",
           courseId
         );
-      }, 800); // Very fast response
+      }, 180000); // 3 minutes
       
       return courseId;
     } catch (error: any) {
@@ -118,7 +119,7 @@ export const useCourseGeneration = () => {
           difficulty as "beginner" | "intermediate" | "advanced",
           courseId
         );
-      }, 800);
+      }, 180000); // Still wait 3 minutes even in error case
       
       return courseId;
     }
@@ -132,7 +133,7 @@ export const useCourseGeneration = () => {
     courseId: string
   ) => {
     try {
-      setProgress(70);
+      setProgress(100);
       
       // Get static course data or create dummy data
       let staticCourse = getStaticCourse(topic, difficulty);
@@ -197,13 +198,7 @@ export const useCourseGeneration = () => {
         };
       }
       
-      setProgress(90);
-      
-      // Extract the summary
-      const summary = staticCourse.summary || `Static course on ${topic} for ${purpose} level`;
-      
       console.log(`Course ${courseId} updated with static/dummy content`);
-      setProgress(100);
       
     } catch (error: any) {
       console.error(`Error in static course generation for course ${courseId}:`, error);
