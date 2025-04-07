@@ -7,7 +7,8 @@ interface LoadingOverlayProps {
   message?: string;
   subMessage?: string;
   minimal?: boolean;
-  autoDismiss?: number; // Time in ms after which to auto-dismiss
+  autoDismiss?: number | false; // Time in ms after which to auto-dismiss, false to disable
+  progress?: number; // Optional progress percentage (0-100)
   onDismissed?: () => void;
 }
 
@@ -16,7 +17,8 @@ const LoadingOverlay = ({
   message = "Processing", 
   subMessage = "Please wait while we process your request.",
   minimal = false,
-  autoDismiss = 5000, // Default auto-dismiss to 5 seconds
+  autoDismiss = false, // Default is no auto-dismiss
+  progress,
   onDismissed
 }: LoadingOverlayProps) => {
   const [visible, setVisible] = useState(isLoading);
@@ -41,6 +43,9 @@ const LoadingOverlay = ({
       <div className="fixed top-4 right-4 bg-card p-3 rounded-lg shadow-lg z-50 flex items-center space-x-2">
         <Loader2 className="h-4 w-4 animate-spin" />
         <span className="text-sm font-medium">{message}</span>
+        {progress !== undefined && (
+          <span className="text-xs text-muted-foreground">{progress}%</span>
+        )}
       </div>
     );
   }
@@ -53,6 +58,17 @@ const LoadingOverlay = ({
         <p className="text-muted-foreground">
           {subMessage}
         </p>
+        {progress !== undefined && progress > 0 && (
+          <div className="w-full mt-4">
+            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all duration-300 ease-in-out" 
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">{progress}% complete</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { analyzeFacialExpression } from '../services/api';
 
 // Enhanced facial expression analysis that will connect to Flask API in the future
 const useFacialAnalysis = (
@@ -52,12 +51,37 @@ const useFacialAnalysis = (
         return;
       }
       
-      // In the future, this will send the image to the Flask API
-      // For now, use the mock function from api.ts
-      const analysis = await analyzeFacialExpression(imageBlob);
+      // Simulate facial analysis with random data for now
+      // In a real implementation, this would call the Flask API
+      const mockAnalysis = {
+        confident: Math.random() * 100,
+        stressed: Math.random() * 50,
+        hesitant: Math.random() * 70,
+        nervous: Math.random() * 60,
+        excited: Math.random() * 80
+      };
       
+      setFacialData(mockAnalysis);
+      allAnalysisData.current.push(mockAnalysis);
+      
+      // In the future, we would send the image to the Flask API like this:
+      /*
+      const formData = new FormData();
+      formData.append('image', imageBlob, 'frame.jpg');
+      
+      const response = await fetch(`${FLASK_API_URL}/analyze_facial`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to analyze facial expression');
+      }
+      
+      const analysis = await response.json();
       setFacialData(analysis);
       allAnalysisData.current.push(analysis);
+      */
     } catch (error) {
       console.error('Error analyzing facial expression:', error);
     }

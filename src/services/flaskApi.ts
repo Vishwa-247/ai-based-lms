@@ -31,9 +31,41 @@ const callFlaskApi = async <T>(endpoint: string, data: any): Promise<T> => {
   }
 };
 
+/**
+ * Upload form data to Flask API (for file uploads like images)
+ */
+export const uploadToFlaskApi = async <T>(endpoint: string, formData: FormData): Promise<T> => {
+  try {
+    const response = await fetch(`${FLASK_API_URL}${endpoint}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Flask API error: ${response.status} ${errorText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData.data as T;
+  } catch (error: any) {
+    console.error(`Error uploading to Flask API (${endpoint}):`, error);
+    throw error;
+  }
+};
+
 // Type for API responses containing text content
 export interface TextResponse {
   text: string;
+}
+
+// Type for facial analysis response
+export interface FacialAnalysisResponse {
+  confident: number;
+  stressed: number;
+  hesitant: number;
+  nervous: number;
+  excited: number;
 }
 
 /**
@@ -95,6 +127,16 @@ export const generateFlashcardsWithFlask = async (
     action: 'custom_content',
     prompt
   });
+};
+
+/**
+ * Analyze a video frame for facial expressions
+ */
+export const analyzeFacialExpressionWithFlask = async (imageBlob: Blob): Promise<FacialAnalysisResponse> => {
+  const formData = new FormData();
+  formData.append('image', imageBlob, 'frame.jpg');
+  
+  return uploadToFlaskApi<FacialAnalysisResponse>('/analyze_facial', formData);
 };
 
 /**

@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Camera, Mic, MicOff, Video, VideoOff, RotateCw } from "lucide-react";
 import GlassMorphism from "../ui/GlassMorphism";
+import useFacialAnalysis from "@/hooks/useFacialAnalysis";
 
 interface VideoRecorderProps {
   onRecordingComplete: (blob: Blob) => void;
@@ -25,6 +26,9 @@ const VideoRecorder = ({
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [error, setError] = useState<string>("");
   const [countdown, setCountdown] = useState<number | null>(null);
+  
+  // Use facial analysis hook when recording
+  const { facialData, isAnalyzing, startAnalysis, stopAnalysis } = useFacialAnalysis(isRecording, 1000);
   
   useEffect(() => {
     const initCamera = async () => {
@@ -74,13 +78,18 @@ const VideoRecorder = ({
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
+      
+      // Stop facial analysis if it's running
+      stopAnalysis();
     };
-  }, [videoEnabled, audioEnabled, onRecordingComplete]);
+  }, [videoEnabled, audioEnabled, onRecordingComplete, stopAnalysis]);
   
   // Watch for isRecording state changes
   useEffect(() => {
     if (isRecording && mediaRecorderRef.current && mediaRecorderRef.current.state !== "recording") {
       try {
+        // Start facial analysis
+        startAnalysis();
         mediaRecorderRef.current.start();
         console.log("Recording started");
       } catch (err) {
@@ -90,12 +99,14 @@ const VideoRecorder = ({
     } else if (!isRecording && mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       try {
         mediaRecorderRef.current.stop();
+        // Stop facial analysis
+        stopAnalysis();
         console.log("Recording stopped");
       } catch (err) {
         console.error("Error stopping recording:", err);
       }
     }
-  }, [isRecording]);
+  }, [isRecording, startAnalysis, stopAnalysis]);
   
   const toggleVideo = () => {
     if (streamRef.current) {
@@ -134,6 +145,23 @@ const VideoRecorder = ({
     stopRecording();
   };
   
+  // Display facial analysis data if available and recording
+  const renderFacialAnalysis = () => {
+    if (!isRecording || !isAnalyzing) return null;
+    
+    return (
+      <div className="absolute bottom-4 left-4 bg-black/60 rounded-lg p-2 text-xs text-white">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          <div>Confidence: {facialData.confident.toFixed(1)}%</div>
+          <div>Stress: {facialData.stressed.toFixed(1)}%</div>
+          <div>Hesitation: {facialData.hesitant.toFixed(1)}%</div>
+          <div>Nervousness: {facialData.nervous.toFixed(1)}%</div>
+          <div>Engagement: {facialData.excited.toFixed(1)}%</div>
+        </div>
+      </div>
+    );
+  };
+  
   return (
     <div className="flex flex-col space-y-4">
       <div className="relative rounded-lg overflow-hidden aspect-video bg-black/20">
@@ -163,6 +191,8 @@ const VideoRecorder = ({
             <span className="text-sm font-medium text-white">Recording</span>
           </div>
         )}
+        
+        {renderFacialAnalysis()}
         
         {countdown !== null && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">

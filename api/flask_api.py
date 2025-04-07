@@ -3,6 +3,9 @@ from flask import Flask, request, jsonify
 import google.generativeai as genai
 import os
 from flask_cors import CORS
+import base64
+import io
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -131,6 +134,54 @@ def generate():
     except Exception as e:
         print(f"Error in generate endpoint: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/analyze_facial', methods=['POST'])
+def analyze_facial():
+    """
+    Analyze facial expressions from an image
+    
+    This endpoint accepts a multipart form data with an 'image' field containing the image file.
+    It returns a JSON object with confidence scores for different facial expressions.
+    
+    In a real implementation, this would use a proper computer vision model.
+    For now, we'll return simulated values.
+    """
+    try:
+        # Check if image is in request
+        if 'image' not in request.files:
+            return jsonify({
+                "success": False,
+                "error": "No image provided"
+            }), 400
+            
+        # Get the image file
+        image_file = request.files['image']
+        
+        # Normally, we would process the image with a CV model here
+        # For this demo, we'll return simulated values
+        # These would be percentages representing confidence in different expressions
+        
+        # Generate simulated facial expression analysis
+        # In reality, this would be the output of a computer vision model
+        analysis_result = {
+            "confident": min(max(50 + (datetime.now().timestamp() % 30) - 15, 0), 100),
+            "stressed": min(max(30 + (datetime.now().timestamp() % 40) - 20, 0), 100),
+            "hesitant": min(max(40 + (datetime.now().timestamp() % 20) - 10, 0), 100),
+            "nervous": min(max(20 + (datetime.now().timestamp() % 50) - 25, 0), 100),
+            "excited": min(max(60 + (datetime.now().timestamp() % 25) - 12, 0), 100)
+        }
+        
+        return jsonify({
+            "success": True,
+            "data": analysis_result
+        }), 200
+        
+    except Exception as e:
+        print(f"Error in analyze_facial endpoint: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 if __name__ == '__main__':
     # Default port is 5000, but can be configured with an environment variable
