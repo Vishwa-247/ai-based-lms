@@ -47,6 +47,27 @@ const staticQuestions = {
     "How do you ensure security in your DevOps processes?",
     "How do you handle incident response in a production environment?"
   ],
+  "ML Engineer": [
+    "Explain your experience with deploying machine learning models to production.",
+    "How do you ensure the quality and reliability of machine learning systems?",
+    "Describe your approach to feature engineering and selection.",
+    "How do you handle the challenges of training models on large datasets?",
+    "How do you keep up with the rapidly evolving field of machine learning?"
+  ],
+  "Full Stack Developer": [
+    "How do you manage the frontend and backend parts of an application?",
+    "What's your approach to ensuring data consistency across the stack?",
+    "Tell me about a full stack project you've worked on from inception to deployment.",
+    "How do you handle authentication and authorization in a full stack app?",
+    "What strategies do you use for state management across the entire application?"
+  ],
+  "Cloud Architect": [
+    "How do you approach designing multi-region, highly available cloud architectures?",
+    "Describe your experience with cloud cost optimization.",
+    "How do you implement security in cloud environments?",
+    "Explain how you manage cloud infrastructure at scale.",
+    "How do you approach migrating legacy applications to the cloud?"
+  ],
   "Default": [
     "Tell me about your background and experience.",
     "What are your strengths and weaknesses?",
@@ -124,9 +145,11 @@ const MockInterview = () => {
     // Get questions based on role
     const jobType = role.includes("Frontend") ? "Frontend Developer" :
                     role.includes("Backend") ? "Backend Developer" :
-                    role.includes("Full") ? "Software Engineer" :
+                    role.includes("Full") ? "Full Stack Developer" :
                     role.includes("Data") ? "Data Scientist" :
-                    role.includes("DevOps") ? "DevOps Engineer" : "Default";
+                    role.includes("DevOps") ? "DevOps Engineer" :
+                    role.includes("ML") ? "ML Engineer" :
+                    role.includes("Cloud") ? "Cloud Architect" : "Default";
     
     const interviewQuestions = staticQuestions[jobType as keyof typeof staticQuestions] || staticQuestions["Default"];
     
@@ -203,9 +226,11 @@ const MockInterview = () => {
     // Set up with static interview questions
     const jobType = interview.job_role.includes("Frontend") ? "Frontend Developer" :
                     interview.job_role.includes("Backend") ? "Backend Developer" :
-                    interview.job_role.includes("Full") ? "Software Engineer" :
+                    interview.job_role.includes("Full") ? "Full Stack Developer" :
                     interview.job_role.includes("Data") ? "Data Scientist" :
-                    interview.job_role.includes("DevOps") ? "DevOps Engineer" : "Default";
+                    interview.job_role.includes("DevOps") ? "DevOps Engineer" :
+                    interview.job_role.includes("ML") ? "ML Engineer" :
+                    interview.job_role.includes("Cloud") ? "Cloud Architect" : "Default";
     
     const interviewQuestions = staticQuestions[jobType as keyof typeof staticQuestions] || staticQuestions["Default"];
     
