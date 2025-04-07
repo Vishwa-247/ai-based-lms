@@ -1,5 +1,6 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import InterviewSetup from "@/components/interview/InterviewSetup";
 import VideoRecorder from "@/components/interview/VideoRecorder";
@@ -7,35 +8,212 @@ import Container from "@/components/ui/Container";
 import { ChevronLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CourseForm from "@/components/course/CourseForm";
-import LoadingOverlay from "@/components/ui/LoadingOverlay";
-import { InterviewStage, useInterview } from "@/context/InterviewContext";
+import { useToast } from "@/hooks/use-toast";
+import { getInterviewData } from "@/data/mockInterviewData";
+
+const staticQuestions = {
+  "Software Engineer": [
+    "Tell me about your experience with agile development methodologies.",
+    "How do you approach debugging complex issues in your code?",
+    "Describe a time when you had to design a scalable web application.",
+    "How do you use version control in your workflow?",
+    "Tell me about a challenging project you've worked on and how you handled it."
+  ],
+  "Frontend Developer": [
+    "Explain how React hooks work and their advantages over class components.",
+    "How do you optimize website performance?",
+    "What strategies do you use for responsive design?",
+    "How do you approach testing frontend applications?",
+    "How do you ensure cross-browser compatibility in your web applications?"
+  ],
+  "Backend Developer": [
+    "How do you design database schemas for scalability?",
+    "What security measures do you implement in your APIs?",
+    "How have you implemented microservices architecture?",
+    "Explain your approach to error handling in a backend application.",
+    "How do you handle API versioning?"
+  ],
+  "Data Scientist": [
+    "How do you handle data preparation and cleaning?",
+    "Which machine learning algorithms have you used and in what contexts?",
+    "How do you validate your models?",
+    "How do you translate business problems into data science solutions?",
+    "How do you communicate technical findings to non-technical stakeholders?"
+  ],
+  "DevOps Engineer": [
+    "Describe your experience setting up CI/CD pipelines.",
+    "How do you approach infrastructure automation?",
+    "What monitoring and logging practices do you implement?",
+    "How do you ensure security in your DevOps processes?",
+    "How do you handle incident response in a production environment?"
+  ],
+  "Default": [
+    "Tell me about your background and experience.",
+    "What are your strengths and weaknesses?",
+    "How do you stay updated with the latest technologies?",
+    "How do you approach problem-solving?",
+    "Where do you see yourself in 5 years?"
+  ]
+};
+
+enum InterviewStage {
+  Setup = "setup",
+  Questions = "questions",
+  Recording = "recording",
+  Complete = "complete",
+}
 
 const MockInterview = () => {
-  const {
-    isLoading,
-    stage,
-    questions,
-    currentQuestionIndex,
-    isCourseTabActive,
-    isGeneratingCourse,
-    isRecording,
-    recordingComplete,
-    isProcessing,
-    recentInterviews,
-    recentCourses,
-    setStage,
-    setCourseTabActive,
-    handleInterviewSetup,
-    handleAnswerSubmitted,
-    handleNextQuestion,
-    handleSubmitCourse,
-    startRecording,
-    stopRecording,
-    handleCancel,
-    handleDownloadInterview,
-    resumeInterview,
-    interviewData
-  } = useInterview();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [stage, setStage] = useState<InterviewStage>(InterviewStage.Setup);
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isCourseTabActive, setCourseTabActive] = useState(false);
+  const [isGeneratingCourse, setIsGeneratingCourse] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingComplete, setRecordingComplete] = useState(false);
+  const [interviewId, setInterviewId] = useState<string>("mock-001");
+
+  // Static mock interviews data
+  const recentInterviews = [
+    { id: "mock-001", job_role: "Frontend Developer", tech_stack: "React, TypeScript", experience: "3-5", created_at: new Date().toISOString(), user_id: "mock-user", completed: true },
+    { id: "mock-002", job_role: "Full Stack Engineer", tech_stack: "Node.js, Express, MongoDB", experience: "1-3", created_at: new Date().toISOString(), user_id: "mock-user", completed: false },
+    { id: "mock-003", job_role: "Data Scientist", tech_stack: "Python, TensorFlow, PyTorch", experience: "5+", created_at: new Date().toISOString(), user_id: "mock-user", completed: true },
+  ];
+
+  // Static mock courses data
+  const recentCourses = [
+    {
+      title: "React Fundamentals",
+      purpose: "job_interview",
+      difficulty: "intermediate",
+      date: "15 minutes ago",
+      status: "Generated",
+      progress: 100,
+      id: "mock1"
+    },
+    {
+      title: "Data Structures and Algorithms",
+      purpose: "exam",
+      difficulty: "advanced",
+      date: "2 hours ago",
+      status: "Generated",
+      progress: 100,
+      id: "mock2"
+    },
+    {
+      title: "Machine Learning Basics",
+      purpose: "practice",
+      difficulty: "beginner",
+      date: "Yesterday",
+      status: "Generated",
+      progress: 100,
+      id: "mock3"
+    }
+  ];
+
+  const handleInterviewSetup = (role: string, techStack: string, experience: string) => {
+    setIsLoading(true);
+    
+    // Generate a mock interview ID
+    const mockId = `mock-${Date.now()}`;
+    setInterviewId(mockId);
+    
+    // Get questions based on role
+    const jobType = role.includes("Frontend") ? "Frontend Developer" :
+                    role.includes("Backend") ? "Backend Developer" :
+                    role.includes("Full") ? "Software Engineer" :
+                    role.includes("Data") ? "Data Scientist" :
+                    role.includes("DevOps") ? "DevOps Engineer" : "Default";
+    
+    const interviewQuestions = staticQuestions[jobType as keyof typeof staticQuestions] || staticQuestions["Default"];
+    
+    // Set up the questions
+    setQuestions(interviewQuestions);
+    setCurrentQuestionIndex(0);
+    
+    // Update UI
+    toast({
+      title: "Interview Created",
+      description: "Your mock interview has been set up successfully.",
+    });
+    
+    setIsLoading(false);
+    setStage(InterviewStage.Questions);
+  };
+
+  const handleAnswerSubmitted = () => {
+    setRecordingComplete(true);
+    toast({
+      title: "Answer Recorded",
+      description: "Your answer has been recorded successfully.",
+    });
+  };
+
+  const handleNextQuestion = () => {
+    setRecordingComplete(false);
+    
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setStage(InterviewStage.Questions);
+    } else {
+      // Interview is complete, navigate directly to results
+      navigate(`/interview-result/mock-001`);
+    }
+  };
+
+  const handleSubmitCourse = (courseName: string, purpose: string, difficulty: string) => {
+    setIsGeneratingCourse(true);
+    
+    // Simulate course generation
+    setTimeout(() => {
+      toast({
+        title: "Course Generation Complete",
+        description: "Your course has been generated successfully.",
+      });
+      
+      setIsGeneratingCourse(false);
+      navigate(`/course/mock1`);
+    }, 2000);
+  };
+
+  const startRecording = () => {
+    setIsRecording(true);
+  };
+  
+  const stopRecording = () => {
+    setIsRecording(false);
+    handleAnswerSubmitted(); // Auto-submit when recording stops
+  };
+  
+  const handleCancel = () => {
+    setStage(InterviewStage.Questions);
+  };
+
+  const handleDownloadInterview = () => {
+    toast({
+      title: "Interview Downloaded",
+      description: "Your interview has been downloaded successfully.",
+    });
+  };
+
+  const resumeInterview = (interview: any) => {
+    // Set up with static interview questions
+    const jobType = interview.job_role.includes("Frontend") ? "Frontend Developer" :
+                    interview.job_role.includes("Backend") ? "Backend Developer" :
+                    interview.job_role.includes("Full") ? "Software Engineer" :
+                    interview.job_role.includes("Data") ? "Data Scientist" :
+                    interview.job_role.includes("DevOps") ? "DevOps Engineer" : "Default";
+    
+    const interviewQuestions = staticQuestions[jobType as keyof typeof staticQuestions] || staticQuestions["Default"];
+    
+    setQuestions(interviewQuestions);
+    setCurrentQuestionIndex(0);
+    setInterviewId(interview.id);
+    setStage(InterviewStage.Questions);
+  };
 
   const renderStage = () => {
     switch (stage) {
@@ -43,8 +221,7 @@ const MockInterview = () => {
         if (questions.length === 0) {
           return (
             <div className="text-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-              <p>Loading questions...</p>
+              <p>No questions available. Please set up a new interview.</p>
             </div>
           );
         }
@@ -77,7 +254,7 @@ const MockInterview = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="p-4 bg-muted rounded-md text-lg">
-                    {questions[currentQuestionIndex]?.question}
+                    {questions[currentQuestionIndex]}
                   </div>
                 </CardContent>
               </Card>
@@ -175,7 +352,7 @@ const MockInterview = () => {
                   Question {currentQuestionIndex + 1}:
                 </h2>
                 <div className="p-4 bg-muted rounded-md text-lg mb-4">
-                  {questions[currentQuestionIndex]?.question}
+                  {questions[currentQuestionIndex]}
                 </div>
                 <p className="text-muted-foreground">
                   When you're ready, click "Start Recording" and begin your answer. We'll analyze both your verbal response and facial expressions.
@@ -241,34 +418,12 @@ const MockInterview = () => {
           </div>
         );
       
-      case InterviewStage.Complete:
-        return (
-          <div className="max-w-3xl mx-auto text-center py-12">
-            <div className="mb-8">
-              <Loader2 className="h-12 w-12 animate-spin mx-auto mb-6" />
-              <h2 className="text-2xl font-bold mb-2">Processing Your Interview</h2>
-              <p className="text-muted-foreground">
-                We're analyzing your responses and preparing your personalized feedback. You'll be redirected automatically when it's ready.
-              </p>
-            </div>
-          </div>
-        );
-      
       default:
         return null;
     }
   };
 
   const renderRecentInterviews = () => {
-    if (recentInterviews.length === 0) {
-      return (
-        <div className="mt-12">
-          <h2 className="text-xl font-semibold mb-4">Recent Mock Interviews</h2>
-          <p className="text-muted-foreground">You haven't completed any mock interviews yet.</p>
-        </div>
-      );
-    }
-    
     return (
       <div className="mt-12">
         <h2 className="text-xl font-semibold mb-4">Recent Mock Interviews</h2>
@@ -302,7 +457,7 @@ const MockInterview = () => {
                     className="w-full" 
                     onClick={() => {
                       if (interview.completed) {
-                        window.location.href = `/interview-result/${interview.id}`;
+                        navigate(`/interview-result/${interview.id}`);
                       } else {
                         resumeInterview(interview);
                       }
@@ -321,16 +476,6 @@ const MockInterview = () => {
 
   return (
     <Container className="py-12">
-      {isProcessing && (
-        <LoadingOverlay 
-          isLoading={true} 
-          message="Analyzing Your Interview"
-          subMessage="Please wait while our AI evaluates your responses."
-          autoDismiss={2000}
-          onDismissed={() => {}}
-        />
-      )}
-      
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-2">
@@ -365,40 +510,42 @@ const MockInterview = () => {
           <div className="mt-12">
             <h2 className="text-xl font-semibold mb-4">Recent Course Generations</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recentCourses.length > 0 ? (
-                recentCourses.map((course) => (
-                  <Card key={course.id} className="overflow-hidden">
-                    <CardHeader className="pb-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">{course.title}</CardTitle>
-                          <CardDescription>{new Date(course.created_at).toLocaleDateString()}</CardDescription>
-                        </div>
-                        <div className="px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary">
-                          {course.purpose.replace('_', ' ')}
-                        </div>
+              {recentCourses.map((course, index) => (
+                <Card key={index} className="overflow-hidden">
+                  <CardHeader className="pb-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{course.title}</CardTitle>
+                        <CardDescription>{course.date}</CardDescription>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">{course.difficulty}</span>
-                        <span className="text-sm text-muted-foreground">Generated</span>
+                      <div className="px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary">
+                        {course.purpose.replace('_', ' ')}
                       </div>
-                      <div className="mt-4">
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => window.location.href = `/course/${course.id}`}
-                        >
-                          View Course
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <p className="text-muted-foreground col-span-3">No courses generated yet. Try creating your first course above!</p>
-              )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">{course.difficulty}</span>
+                      <span className="text-sm text-muted-foreground">{course.status}</span>
+                    </div>
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary" 
+                        style={{ width: `${course.progress}%` }}
+                      ></div>
+                    </div>
+                    <div className="mt-4">
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => navigate(`/course/${course.id}`)}
+                      >
+                        View Course
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>

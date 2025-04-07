@@ -31,7 +31,7 @@ export const useCourseGeneration = () => {
       console.log("Setting up interval to check course generation status for ID:", courseGenerationId);
       
       // Speed up the course generation progress checks - check every 500ms
-      intervalId = window.setInterval(async () => {
+      intervalId = window.setInterval(() => {
         // Simulate fast progress
         setProgress(prev => {
           const newProgress = prev + 25; // Much faster progress
