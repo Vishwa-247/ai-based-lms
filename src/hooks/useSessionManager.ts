@@ -22,25 +22,46 @@ export const useSessionManager = () => {
           setUser(null);
         }
         
-        // Get current session (but don't persist) - we want users to log in each time
-        const { data: { session } } = await supabase.auth.getSession();
+        // For demo purposes, check if we have stored demo user
+        const demoAuthData = localStorage.getItem('supabase.auth.token');
         
-        if (mounted && session) {
-          setSession(session);
-          setUser(session?.user ?? null);
+        if (demoAuthData) {
+          const demoData = JSON.parse(demoAuthData);
+          const demoUser = demoData.currentSession?.user;
           
-          // Sync user profile if session exists
-          if (session?.user) {
-            const { id, email, user_metadata } = session.user;
-            const fullName = user_metadata?.full_name || '';
+          if (demoUser) {
+            // Create a fake session object
+            const mockSession = {
+              access_token: demoData.currentSession.access_token || 'demo-token',
+              refresh_token: demoData.currentSession.refresh_token || 'demo-refresh-token',
+              user: demoUser,
+              expires_at: Date.now() + 3600000, // 1 hour from now
+              expires_in: 3600
+            } as unknown as Session;
             
-            if (id && email) {
-              await syncUserProfile(id, fullName, email);
+            if (mounted) {
+              setSession(mockSession);
+              setUser(demoUser as unknown as User);
             }
           }
         } else {
-          // Ensure we clear any existing session data
-          await supabase.auth.signOut();
+          // If no demo user found, check for real Supabase session
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          if (mounted && session) {
+            setSession(session);
+            setUser(session?.user ?? null);
+            
+            // Sync user profile if session exists
+            if (session?.user) {
+              const { id, email, user_metadata } = session.user;
+              const fullName = user_metadata?.full_name || '';
+              
+              if (id && email) {
+                await syncUserProfile(id, fullName, email);
+              }
+            }
+          }
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -73,6 +94,7 @@ export const useSessionManager = () => {
           if (event === 'SIGNED_OUT') {
             setSession(null);
             setUser(null);
+            localStorage.removeItem('supabase.auth.token');
           }
         }
       }

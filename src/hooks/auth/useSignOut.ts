@@ -11,7 +11,10 @@ export const useSignOut = () => {
     try {
       setIsLoading(true);
       
-      // Call supabase signOut
+      // Clear demo user from localStorage
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Also call supabase signOut in case there's a real session
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       

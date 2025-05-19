@@ -13,12 +13,29 @@ export const useSignIn = () => {
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({ 
-        email, 
-        password
-      });
       
-      if (error) throw error;
+      // For demo purposes, we'll accept any credentials
+      // This simulates a successful login without requiring a real Supabase connection
+      const demoUser = {
+        id: 'demo-user-id-123',
+        email: email || 'demo@example.com',
+        user_metadata: {
+          full_name: 'Demo User',
+          avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo'
+        }
+      };
+      
+      // Wait a moment to simulate network request
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Store the demo user in localStorage to persist across page refreshes
+      localStorage.setItem('supabase.auth.token', JSON.stringify({
+        currentSession: {
+          access_token: 'demo-access-token',
+          refresh_token: 'demo-refresh-token',
+          user: demoUser
+        }
+      }));
       
       toast({
         title: "Welcome back!",

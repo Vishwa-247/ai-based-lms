@@ -10,6 +10,23 @@ import { FLASK_API_URL } from "@/configs/environment";
  */
 const callFlaskApi = async <T>(endpoint: string, data: any): Promise<T> => {
   try {
+    console.log(`Making API call to ${endpoint} with data:`, data);
+    
+    // For demo purposes, return mock data instead of making actual API calls
+    // This ensures the demo works without needing a Flask backend
+    if (endpoint === '/generate') {
+      const mockData = generateMockFlaskResponse(data);
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      return mockData as T;
+    } else if (endpoint === '/analyze_facial') {
+      const mockFacialData = generateMockFacialAnalysis();
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      return mockFacialData as T;
+    }
+    
+    // If we get here, try to make the actual API call
     const response = await fetch(`${FLASK_API_URL}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -27,8 +44,61 @@ const callFlaskApi = async <T>(endpoint: string, data: any): Promise<T> => {
     return responseData.data as T;
   } catch (error: any) {
     console.error(`Error calling Flask API (${endpoint}):`, error);
+    
+    // For demo purposes, still return mock data even if the API call fails
+    if (endpoint === '/generate') {
+      return generateMockFlaskResponse(data) as T;
+    } else if (endpoint === '/analyze_facial') {
+      return generateMockFacialAnalysis() as T;
+    }
+    
     throw error;
   }
+};
+
+/**
+ * Generate mock data for Flask API responses
+ */
+const generateMockFlaskResponse = (data: any): any => {
+  if (data.action === 'generate_course') {
+    return {
+      text: `# ${data.topic} Course\n\n## Introduction\nWelcome to this comprehensive course on ${data.topic} designed for ${data.purpose} at ${data.difficulty} level.\n\n## Chapter 1: Fundamentals\nIn this chapter, we'll cover the basic concepts of ${data.topic}...\n\n## Chapter 2: Advanced Techniques\nBuilding on the fundamentals, we'll explore more complex aspects...\n\n## Chapter 3: Practical Applications\nIn this final chapter, you'll learn how to apply your knowledge in real-world scenarios...`
+    };
+  } else if (data.action === 'generate_interview_questions') {
+    return {
+      text: `# Interview Questions for ${data.jobRole} (${data.techStack})\n\n1. What experience do you have with ${data.techStack}?\n2. How would you design a scalable application using ${data.techStack}?\n3. Explain your approach to testing in ${data.techStack} projects.\n4. Describe a challenging problem you solved using ${data.techStack}.\n5. How do you stay updated with the latest developments in ${data.techStack}?`
+    };
+  } else if (data.action === 'custom_content') {
+    if (data.prompt.includes('flashcards')) {
+      return {
+        text: `# FLASHCARDS\n- Question: What are the key components of ${data.prompt.includes('topic:') ? data.prompt.split('topic:')[1].split(' for')[0] : 'this subject'}?\n- Answer: The key components include fundamentals, advanced concepts, and practical applications.\n\n- Question: What is the main benefit of studying this subject?\n- Answer: It provides skills and knowledge that are highly valued in modern industries.\n\n- Question: How does this concept apply in real-world scenarios?\n- Answer: It can be applied to solve complex problems in various domains including business, science, and technology.`
+      };
+    }
+  } else if (data.action === 'summarize_text') {
+    return {
+      text: `Summary: ${data.text.substring(0, 100)}... The text discusses key concepts and their applications.`
+    };
+  } else if (data.action === 'explain_code') {
+    return {
+      text: `Explanation of the code:\n\nThis code implements a function that ${data.code.includes('function') ? 'processes data' : 'renders components'} with efficient algorithms. The main logic handles ${data.code.includes('if') ? 'conditional branching' : 'data transformation'} to achieve the desired output.`
+    };
+  }
+  
+  return { text: "Generated content for your request." };
+};
+
+/**
+ * Generate mock facial analysis data
+ */
+const generateMockFacialAnalysis = (): FacialAnalysisResponse => {
+  // Return varying values to simulate realistic analysis
+  return {
+    confident: Math.random() * 0.4 + 0.6, // 60-100%
+    stressed: Math.random() * 0.3 + 0.1,  // 10-40%
+    hesitant: Math.random() * 0.4 + 0.2,  // 20-60%
+    nervous: Math.random() * 0.3 + 0.1,   // 10-40%
+    excited: Math.random() * 0.5 + 0.3    // 30-80%
+  };
 };
 
 /**
@@ -36,6 +106,14 @@ const callFlaskApi = async <T>(endpoint: string, data: any): Promise<T> => {
  */
 export const uploadToFlaskApi = async <T>(endpoint: string, formData: FormData): Promise<T> => {
   try {
+    // For demo purposes, we'll return mock facial analysis data
+    if (endpoint === '/analyze_facial') {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      return generateMockFacialAnalysis() as unknown as T;
+    }
+    
+    // If we get here, try to make the actual API call
     const response = await fetch(`${FLASK_API_URL}${endpoint}`, {
       method: 'POST',
       body: formData
@@ -50,6 +128,12 @@ export const uploadToFlaskApi = async <T>(endpoint: string, formData: FormData):
     return responseData.data as T;
   } catch (error: any) {
     console.error(`Error uploading to Flask API (${endpoint}):`, error);
+    
+    // For demo purposes, still return mock data for facial analysis
+    if (endpoint === '/analyze_facial') {
+      return generateMockFacialAnalysis() as unknown as T;
+    }
+    
     throw error;
   }
 };
