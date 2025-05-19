@@ -15,12 +15,13 @@ export const useSignIn = () => {
       
       // For demo purposes, we'll accept any credentials
       // This simulates a successful login without requiring a real Supabase connection
+      const username = email.split('@')[0];
       const demoUser = {
-        id: 'demo-user-id-123',
+        id: `demo-user-id-${Math.random().toString(36).substring(2, 9)}`,
         email: email || 'demo@example.com',
         user_metadata: {
-          full_name: email ? email.split('@')[0] : 'Demo User',
-          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email || 'demo'}`
+          full_name: username || 'Demo User',
+          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username || 'demo'}`
         }
       };
       
@@ -30,14 +31,14 @@ export const useSignIn = () => {
       // Store the demo user in localStorage to persist across page refreshes
       localStorage.setItem('supabase.auth.token', JSON.stringify({
         currentSession: {
-          access_token: 'demo-access-token',
-          refresh_token: 'demo-refresh-token',
+          access_token: `demo-access-token-${Math.random().toString(36).substring(2, 9)}`,
+          refresh_token: `demo-refresh-token-${Math.random().toString(36).substring(2, 9)}`,
           user: demoUser
         }
       }));
       
       toast({
-        title: "Welcome to StudyMate!",
+        title: `Welcome to StudyMate, ${demoUser.user_metadata.full_name}!`,
         description: "You have successfully signed in. Explore courses and mock interviews!"
       });
       

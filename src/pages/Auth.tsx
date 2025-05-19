@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { z } from "zod";
@@ -42,6 +42,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
+  const [isAutoDemoLogin, setIsAutoDemoLogin] = useState(false);
   const { signIn, signUp, user, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -63,6 +64,54 @@ export default function Auth() {
       confirmPassword: "",
     },
   });
+
+  // Auto-fill and submit demo login credentials
+  useEffect(() => {
+    if (isAutoDemoLogin && !isLoading) {
+      // Generate random user credentials
+      const randomName = `demo${Math.floor(Math.random() * 1000)}`;
+      const randomEmail = `${randomName}@example.com`;
+      const randomPassword = `demo${Math.floor(Math.random() * 1000000)}`;
+
+      if (activeTab === "login") {
+        // Set form values and mark as touched
+        loginForm.setValue("email", randomEmail);
+        loginForm.setValue("password", randomPassword);
+        
+        // Show a loading toast
+        toast({
+          title: "Demo Mode Active",
+          description: `Signing in with ${randomEmail}...`,
+        });
+        
+        // Submit the login form after a brief delay to show the filled fields
+        const timer = setTimeout(() => {
+          handleDemoLogin();
+        }, 800);
+        
+        return () => clearTimeout(timer);
+      } else {
+        // Fill the signup form
+        signupForm.setValue("fullName", `Demo User ${randomName}`);
+        signupForm.setValue("email", randomEmail);
+        signupForm.setValue("password", randomPassword);
+        signupForm.setValue("confirmPassword", randomPassword);
+        
+        // Show a loading toast
+        toast({
+          title: "Demo Mode Active",
+          description: `Creating demo account with ${randomEmail}...`,
+        });
+        
+        // Submit the signup form after a brief delay
+        const timer = setTimeout(() => {
+          signupForm.handleSubmit(onSignupSubmit)();
+        }, 800);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isAutoDemoLogin, activeTab, isLoading]);
 
   const onLoginSubmit = async (values: LoginFormValues) => {
     try {
@@ -88,11 +137,18 @@ export default function Auth() {
 
   const handleDemoLogin = async () => {
     try {
-      await signIn("demo@example.com", "password123");
+      const randomEmail = `demo${Math.floor(Math.random() * 1000)}@example.com`;
+      const randomPassword = "password123";
+      await signIn(randomEmail, randomPassword);
       navigate("/dashboard");
     } catch (error) {
       console.error("Demo login failed:", error);
     }
+  };
+
+  // Trigger auto demo login
+  const triggerAutoDemoLogin = () => {
+    setIsAutoDemoLogin(true);
   };
 
   // Redirect if already authenticated
@@ -130,7 +186,7 @@ export default function Auth() {
                 <span className="font-medium">Demo Mode Active</span>
               </div>
               <p className="text-sm text-amber-600 dark:text-amber-300">
-                Enter <strong>any</strong> email and password to sign in (no real authentication needed)
+                Enter <strong>any</strong> email and password to sign in or click "Quick Demo Login" for instant access
               </p>
             </div>
             
@@ -192,10 +248,10 @@ export default function Auth() {
                           type="button" 
                           variant="outline" 
                           className="w-full" 
-                          onClick={handleDemoLogin}
-                          disabled={isLoading}
+                          onClick={triggerAutoDemoLogin}
+                          disabled={isLoading || isAutoDemoLogin}
                         >
-                          Quick Demo Login
+                          {isLoading || isAutoDemoLogin ? "Logging in..." : "Quick Demo Login"}
                         </Button>
                       </form>
                     </Form>
@@ -281,10 +337,10 @@ export default function Auth() {
                           type="button" 
                           variant="outline" 
                           className="w-full" 
-                          onClick={handleDemoLogin}
-                          disabled={isLoading}
+                          onClick={triggerAutoDemoLogin}
+                          disabled={isLoading || isAutoDemoLogin}
                         >
-                          Quick Demo Login
+                          {isLoading || isAutoDemoLogin ? "Creating demo account..." : "Quick Demo Login"}
                         </Button>
                       </form>
                     </Form>
