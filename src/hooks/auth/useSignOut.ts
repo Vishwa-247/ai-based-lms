@@ -20,7 +20,7 @@ export const useSignOut = () => {
       
       toast({
         title: "Signed out",
-        description: "You have been signed out successfully."
+        description: "You have been signed out successfully. Come back soon!"
       });
       
       // Force navigation to home page

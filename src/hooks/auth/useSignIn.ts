@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
-import { syncUserProfile } from "@/utils/auth/profileSync";
 
 export const useSignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,8 +19,8 @@ export const useSignIn = () => {
         id: 'demo-user-id-123',
         email: email || 'demo@example.com',
         user_metadata: {
-          full_name: 'Demo User',
-          avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo'
+          full_name: email ? email.split('@')[0] : 'Demo User',
+          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email || 'demo'}`
         }
       };
       
@@ -38,8 +37,8 @@ export const useSignIn = () => {
       }));
       
       toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in."
+        title: "Welcome to StudyMate!",
+        description: "You have successfully signed in. Explore courses and mock interviews!"
       });
       
       navigate('/dashboard');

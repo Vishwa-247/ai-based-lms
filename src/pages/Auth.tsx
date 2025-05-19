@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Container from "@/components/ui/Container";
 import GlassMorphism from "@/components/ui/GlassMorphism";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Info } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -77,12 +77,21 @@ export default function Auth() {
     try {
       await signUp(values.email, values.password, values.fullName);
       toast({
-        title: "Verification email sent!",
-        description: "Please check your email to verify your account.",
+        title: "Account created!",
+        description: "You can now sign in with your credentials.",
       });
       setActiveTab("login");
     } catch (error) {
       console.error("Signup failed:", error);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    try {
+      await signIn("demo@example.com", "password123");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Demo login failed:", error);
     }
   };
 
@@ -115,6 +124,16 @@ export default function Auth() {
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-100 py-12 pt-24">
         <Container size="sm">
           <GlassMorphism className="w-full">
+            <div className="text-center mb-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md">
+              <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-400 mb-1">
+                <Info className="h-4 w-4" />
+                <span className="font-medium">Demo Mode Active</span>
+              </div>
+              <p className="text-sm text-amber-600 dark:text-amber-300">
+                Enter <strong>any</strong> email and password to sign in (no real authentication needed)
+              </p>
+            </div>
+            
             <Tabs value={activeTab} onValueChange={(val: string) => setActiveTab(val as "login" | "signup")}>
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
@@ -158,6 +177,25 @@ export default function Auth() {
                         />
                         <Button type="submit" className="w-full" disabled={isLoading}>
                           {isLoading ? "Signing in..." : "Sign In"}
+                        </Button>
+                        
+                        <div className="relative my-4">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border"></div>
+                          </div>
+                          <div className="relative flex justify-center text-xs">
+                            <span className="bg-card px-2 text-muted-foreground">Or</span>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="w-full" 
+                          onClick={handleDemoLogin}
+                          disabled={isLoading}
+                        >
+                          Quick Demo Login
                         </Button>
                       </form>
                     </Form>
@@ -228,6 +266,25 @@ export default function Auth() {
                         />
                         <Button type="submit" className="w-full" disabled={isLoading}>
                           {isLoading ? "Creating account..." : "Create Account"}
+                        </Button>
+                        
+                        <div className="relative my-4">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border"></div>
+                          </div>
+                          <div className="relative flex justify-center text-xs">
+                            <span className="bg-card px-2 text-muted-foreground">Or</span>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="w-full" 
+                          onClick={handleDemoLogin}
+                          disabled={isLoading}
+                        >
+                          Quick Demo Login
                         </Button>
                       </form>
                     </Form>
