@@ -23,15 +23,15 @@ import GlassMorphism from "@/components/ui/GlassMorphism";
 import { ChevronLeft, Info } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  email: z.string().min(1, { message: "Email is required" }),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 
 const signupSchema = z.object({
-  fullName: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  confirmPassword: z.string(),
+  fullName: z.string().min(1, { message: "Name is required" }),
+  email: z.string().min(1, { message: "Email is required" }),
+  password: z.string().min(1, { message: "Password is required" }),
+  confirmPassword: z.string().min(1, { message: "Please confirm your password" }),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -113,6 +113,16 @@ export default function Auth() {
     }
   }, [isAutoDemoLogin, activeTab, isLoading]);
 
+  // Auto-initiate demo login when page loads
+  useEffect(() => {
+    // Start demo login process after a short delay
+    const timer = setTimeout(() => {
+      setIsAutoDemoLogin(true);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const onLoginSubmit = async (values: LoginFormValues) => {
     try {
       await signIn(values.email, values.password);
@@ -125,11 +135,7 @@ export default function Auth() {
   const onSignupSubmit = async (values: SignupFormValues) => {
     try {
       await signUp(values.email, values.password, values.fullName);
-      toast({
-        title: "Account created!",
-        description: "You can now sign in with your credentials.",
-      });
-      setActiveTab("login");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Signup failed:", error);
     }
@@ -186,7 +192,7 @@ export default function Auth() {
                 <span className="font-medium">Demo Mode Active</span>
               </div>
               <p className="text-sm text-amber-600 dark:text-amber-300">
-                Enter <strong>any</strong> email and password to sign in or click "Quick Demo Login" for instant access
+                Auto-signing you in to explore all features. Please wait a moment...
               </p>
             </div>
             
@@ -199,8 +205,8 @@ export default function Auth() {
               <TabsContent value="login">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Welcome Back</CardTitle>
-                    <CardDescription>Sign in to your StudyMate account</CardDescription>
+                    <CardTitle>Welcome to StudyMate</CardTitle>
+                    <CardDescription>Enter any details to sign in or wait for auto-login</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Form {...loginForm}>
@@ -212,7 +218,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Email</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your email address" {...field} />
+                                <Input placeholder="Any email" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -225,7 +231,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Password</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="••••••••" {...field} />
+                                <Input type="password" placeholder="Any password" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -263,7 +269,7 @@ export default function Auth() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Create Account</CardTitle>
-                    <CardDescription>Join StudyMate today</CardDescription>
+                    <CardDescription>Enter any details to create a demo account</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Form {...signupForm}>
@@ -275,7 +281,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Full Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your full name" {...field} />
+                                <Input placeholder="Any name" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -288,7 +294,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Email</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your email address" {...field} />
+                                <Input placeholder="Any email" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -301,7 +307,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Password</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="••••••••" {...field} />
+                                <Input type="password" placeholder="Any password" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -314,7 +320,7 @@ export default function Auth() {
                             <FormItem>
                               <FormLabel>Confirm Password</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="••••••••" {...field} />
+                                <Input type="password" placeholder="Same as password" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

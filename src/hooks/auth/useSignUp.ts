@@ -1,9 +1,7 @@
 
 import { useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
-import { syncUserProfile } from "@/utils/auth/profileSync";
 
 export const useSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,40 +11,42 @@ export const useSignUp = () => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            role: 'user',
-          }
+      
+      // Create a demo user with the provided details
+      const demoUser = {
+        id: `demo-user-id-${Math.random().toString(36).substring(2, 9)}`,
+        email: email || `demo${Math.floor(Math.random() * 1000)}@example.com`,
+        user_metadata: {
+          full_name: fullName || `Demo User ${Math.floor(Math.random() * 1000)}`,
+          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email.split('@')[0] || 'demo'}`
         }
-      });
+      };
       
-      if (error) throw error;
+      // Wait a moment to simulate network request
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // If sign up is successful and we have a user, sync with our users table
-      if (data?.user) {
-        await syncUserProfile(data.user.id, fullName, email, toast);
-      }
+      // Store the demo user in localStorage to persist across page refreshes
+      localStorage.setItem('supabase.auth.token', JSON.stringify({
+        currentSession: {
+          access_token: `demo-access-token-${Math.random().toString(36).substring(2, 9)}`,
+          refresh_token: `demo-refresh-token-${Math.random().toString(36).substring(2, 9)}`,
+          user: demoUser
+        }
+      }));
       
       toast({
         title: "Account created!",
-        description: "Check your email for the confirmation link."
+        description: `Welcome to StudyMate, ${demoUser.user_metadata.full_name}!`
       });
       
-      // Redirect to dashboard if email confirmation is not required
-      if (data?.session) {
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
     } catch (error: any) {
+      console.error("Error in demo sign up:", error);
       toast({
-        title: "Error creating account",
-        description: error.message,
+        title: "Something went wrong",
+        description: "Please try again",
         variant: "destructive"
       });
-      throw error;
     } finally {
       setIsLoading(false);
     }

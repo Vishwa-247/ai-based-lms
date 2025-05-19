@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 
@@ -13,12 +12,11 @@ export const useSignIn = () => {
     try {
       setIsLoading(true);
       
-      // For demo purposes, we'll accept any credentials
-      // This simulates a successful login without requiring a real Supabase connection
-      const username = email.split('@')[0];
+      // Create a demo user with the provided email or generate one
+      const username = email ? email.split('@')[0] : `demo${Math.floor(Math.random() * 1000)}`;
       const demoUser = {
         id: `demo-user-id-${Math.random().toString(36).substring(2, 9)}`,
-        email: email || 'demo@example.com',
+        email: email || `${username}@example.com`,
         user_metadata: {
           full_name: username || 'Demo User',
           avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username || 'demo'}`
@@ -44,12 +42,12 @@ export const useSignIn = () => {
       
       navigate('/dashboard');
     } catch (error: any) {
+      console.error("Error in demo sign in:", error);
       toast({
-        title: "Error signing in",
-        description: error.message,
+        title: "Something went wrong",
+        description: "Please try again",
         variant: "destructive"
       });
-      throw error;
     } finally {
       setIsLoading(false);
     }

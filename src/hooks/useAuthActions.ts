@@ -10,6 +10,7 @@ export const useAuthActions = () => {
 
   const isLoading = isSignInLoading || isSignUpLoading || isSignOutLoading;
 
+  // In demo mode, all authentication functions work with any credentials
   return {
     signIn,
     signUp,

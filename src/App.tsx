@@ -14,7 +14,7 @@ import CourseDetail from "./pages/CourseDetail";
 import InterviewResult from "./pages/InterviewResult";
 import FutureIntegrations from "./pages/FutureIntegrations";
 import Auth from "./pages/Auth";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import { InterviewProvider } from "./context/InterviewContext";
 
 const queryClient = new QueryClient({
@@ -25,21 +25,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// Protected route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isLoading } = useAuth();
-  
-  if (isLoading) {
-    return <Layout><div className="flex items-center justify-center h-[70vh]">Loading...</div></Layout>;
-  }
-  
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return <>{children}</>;
-};
 
 const App = () => (
   <BrowserRouter>
@@ -52,46 +37,17 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/future-integrations" element={<Layout><FutureIntegrations /></Layout>} />
-            <Route path="/course-generator" element={
-              <Layout>
-                <ProtectedRoute>
-                  <CourseGenerator />
-                </ProtectedRoute>
-              </Layout>
-            } />
-            <Route path="/course/:id" element={
-              <Layout>
-                <ProtectedRoute>
-                  <CourseDetail />
-                </ProtectedRoute>
-              </Layout>
-            } />
+            <Route path="/course-generator" element={<Layout><CourseGenerator /></Layout>} />
+            <Route path="/course/:id" element={<Layout><CourseDetail /></Layout>} />
             <Route path="/mock-interview" element={
               <Layout>
-                <ProtectedRoute>
-                  <InterviewProvider>
-                    <MockInterview />
-                  </InterviewProvider>
-                </ProtectedRoute>
+                <InterviewProvider>
+                  <MockInterview />
+                </InterviewProvider>
               </Layout>
             } />
-            <Route path="/interview-result/:id" element={
-              <Layout>
-                <ProtectedRoute>
-                  <InterviewResult />
-                </ProtectedRoute>
-              </Layout>
-            } />
-            <Route 
-              path="/dashboard" 
-              element={
-                <Layout>
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                </Layout>
-              } 
-            />
+            <Route path="/interview-result/:id" element={<Layout><InterviewResult /></Layout>} />
+            <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
             {/* API proxy route for future Flask integration */}
             <Route path="/api/*" element={<div>API Proxy</div>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
