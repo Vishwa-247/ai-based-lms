@@ -27,7 +27,7 @@ export const useSignIn = () => {
       await new Promise(resolve => setTimeout(resolve, 800));
       
       // Store the demo user in localStorage to persist across page refreshes
-      localStorage.setItem('supabase.auth.token', JSON.stringify({
+      localStorage.setItem('auth.token', JSON.stringify({
         currentSession: {
           access_token: `demo-access-token-${Math.random().toString(36).substring(2, 9)}`,
           refresh_token: `demo-refresh-token-${Math.random().toString(36).substring(2, 9)}`,

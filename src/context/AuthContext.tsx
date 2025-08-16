@@ -1,18 +1,15 @@
 
 import { createContext, useContext, ReactNode } from 'react';
-import { Session, User } from '@supabase/supabase-js';
 import { useAuthActions } from '@/hooks/useAuthActions';
 import { useSessionManager } from '@/hooks/useSessionManager';
-import { syncUserProfile } from '@/utils/auth/profileSync';
 
 interface AuthContextType {
-  session: Session | null;
-  user: User | null;
+  session: any;
+  user: any;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
-  syncUserProfile: (userId: string, fullName: string, email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,8 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     signIn,
     signUp,
-    signOut,
-    syncUserProfile
+    signOut
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

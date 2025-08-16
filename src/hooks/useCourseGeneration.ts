@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { courseService } from "@/api/services/courseService";
 import { toast as sonnerToast } from "sonner";
 import { CourseType } from "@/types";
 import { getStaticCourse } from "@/data/staticCourses";

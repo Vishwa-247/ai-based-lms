@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import GlassMorphism from "./ui/GlassMorphism";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { chatService } from "@/api/services/chatService";
 
 interface Message {
   id: string;
@@ -51,24 +51,9 @@ const Chatbot = () => {
     setIsLoading(true);
     
     try {
-      // Call OpenAI via Supabase Edge Function
-      const { data, error } = await supabase.functions.invoke('openai-api', {
-        body: { 
-          action: 'generate',
-          prompt: `You are a helpful assistant for StudyMate, an AI-powered learning platform. 
-                  Answer the following question or request concisely and helpfully: ${input}`
-        }
-      });
-      
-      if (error) {
-        throw new Error(`API error: ${error.message}`);
-      }
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Unknown error occurred');
-      }
-      
-      const botResponse = data.text || "I'm sorry, I couldn't process your request at the moment.";
+      // Call chat service
+      const response = await chatService.sendMessage({ message: input });
+      const botResponse = response.response || "I'm sorry, I couldn't process your request at the moment.";
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
