@@ -225,18 +225,22 @@ export const createInterviewAnalysis = async (
     return {
       id: crypto.randomUUID(),
       interview_id: interviewId,
-      overall_score: 75,
-      technical_score: 80,
-      communication_score: 70,
-      confidence_score: 75,
-      detailed_feedback: "Good performance overall with room for improvement in communication.",
-      strengths: ["Technical knowledge", "Problem solving"],
-      improvements: ["Communication clarity", "Eye contact"],
       facial_data: { confident: 75, stressed: 20, hesitant: 15, nervous: 25, excited: 60 },
-      pronunciation_feedback: { clarity: 80, pace: 75, tone: 70 },
-      technical_feedback: { accuracy: 85, depth: 75, examples: 80 },
-      language_feedback: { grammar: 90, vocabulary: 80, fluency: 75 },
-      recommendations: ["Practice speaking more confidently", "Work on technical examples"]
+      pronunciation_feedback: "Good clarity and pace, but could work on tone variation for better engagement.",
+      technical_feedback: "Strong technical knowledge demonstrated with accurate examples and depth of understanding.",
+      language_feedback: "Excellent grammar and vocabulary usage with good fluency throughout the interview.",
+      recommendations: [
+        {
+          title: "Improve Confidence",
+          description: "Practice speaking more confidently and maintain eye contact",
+          link: "https://example.com/confidence-tips"
+        },
+        {
+          title: "Technical Examples",
+          description: "Work on providing more detailed technical examples",
+          link: "https://example.com/technical-practice"
+        }
+      ],
       created_at: new Date().toISOString()
     } as InterviewAnalysisType;
   }
