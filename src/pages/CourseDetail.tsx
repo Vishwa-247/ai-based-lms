@@ -11,6 +11,7 @@ import { BookOpen, FileText, Layout, Lightbulb, MessageSquare, ChevronLeft, Chec
 import Container from "@/components/ui/Container";
 import { useToast } from "@/hooks/use-toast";
 import { ChapterType, CourseType, FlashcardType, McqType, QnaType } from "@/types";
+import NotebookPanel from "@/components/course/NotebookPanel";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const CourseDetail = () => {
   const [showAnswer, setShowAnswer] = useState<Record<string, boolean>>({});
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
 
-  // Sample data for course details (would normally be fetched from Supabase)
+  // Sample data for course details with structured NotebookLM-style content
   const sampleCourse: CourseType = {
     id: id || "1",
     user_id: "user123",
@@ -34,6 +35,50 @@ const CourseDetail = () => {
     difficulty: "advanced",
     summary: "This comprehensive course delves into advanced React patterns, architecture, and optimization techniques. You'll learn how to structure large-scale applications, implement complex state management strategies, and optimize performance for production environments. Ideal for developers preparing for senior frontend role interviews.",
     created_at: new Date().toISOString(),
+  };
+
+  // Sample structured notebook data
+  const sampleNotebook = {
+    keyConcepts: [
+      { term: "Higher-Order Components", definition: "Functions that take a component and return a new enhanced component" },
+      { term: "React.memo", definition: "Higher-order component that prevents unnecessary re-renders" },
+      { term: "Code Splitting", definition: "Technique to split code into smaller chunks loaded on demand" },
+      { term: "Virtualization", definition: "Rendering only visible items in long lists for performance" }
+    ],
+    analogy: "Think of React optimization like tuning a car engine - you identify bottlenecks (performance issues), upgrade specific parts (memoization, code splitting), and monitor the results (profiling) to achieve maximum efficiency."
+  };
+
+  // Sample mind map data
+  const sampleMindMap = {
+    root: {
+      name: "React Performance",
+      children: [
+        {
+          name: "Component Optimization",
+          children: [
+            { name: "React.memo" },
+            { name: "useMemo" },
+            { name: "useCallback" }
+          ]
+        },
+        {
+          name: "Bundle Optimization",
+          children: [
+            { name: "Code Splitting" },
+            { name: "Dynamic Imports" },
+            { name: "Tree Shaking" }
+          ]
+        },
+        {
+          name: "Rendering Optimization",
+          children: [
+            { name: "Virtualization" },
+            { name: "Web Workers" },
+            { name: "Lazy Loading" }
+          ]
+        }
+      ]
+    }
   };
 
   const sampleChapters: ChapterType[] = [
@@ -594,27 +639,41 @@ Implementing these optimization techniques will help you build React application
         </TabsList>
         
         <TabsContent value="chapters" className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
-            {chapters.map((chapter) => (
-              <Card key={chapter.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-start">
-                    <span className="text-muted-foreground mr-4">
-                      {String(chapter.order_number).padStart(2, '0')}
-                    </span>
-                    {chapter.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose dark:prose-invert max-w-none">
-                    <div dangerouslySetInnerHTML={{ 
-                      __html: renderMarkdown(chapter.content)
-                     }} 
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          {/* Two-column layout: Main content + Notebook panel */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main content - 70% width */}
+            <div className="lg:col-span-2 space-y-6">
+              {chapters.map((chapter) => (
+                <Card key={chapter.id}>
+                  <CardHeader>
+                    <CardTitle className="flex items-start">
+                      <span className="text-muted-foreground mr-4">
+                        {String(chapter.order_number).padStart(2, '0')}
+                      </span>
+                      {chapter.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose dark:prose-invert max-w-none">
+                      <div dangerouslySetInnerHTML={{ 
+                        __html: renderMarkdown(chapter.content)
+                       }} 
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* NotebookLM-style panel - 30% width */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-6">
+                <NotebookPanel 
+                  notebook={sampleNotebook}
+                  mindMap={sampleMindMap}
+                />
+              </div>
+            </div>
           </div>
         </TabsContent>
         
