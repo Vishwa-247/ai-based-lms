@@ -25,9 +25,9 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
+    { name: "Courses", href: "/courses" },
     { name: "Learn", href: "/course-generator" },
     { name: "Interview", href: "/mock-interview" },
-    { name: "Future", href: "/future-integrations" },
     { name: "Dashboard", href: "/dashboard" },
   ];
 
