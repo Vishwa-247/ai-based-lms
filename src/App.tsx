@@ -12,6 +12,8 @@ import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import CourseDetail from "./pages/CourseDetail";
 import Courses from "./pages/Courses";
+import DSASheet from "./pages/DSASheet";
+import DSATopic from "./pages/DSATopic";
 import InterviewResult from "./pages/InterviewResult";
 import FutureIntegrations from "./pages/FutureIntegrations";
 import Auth from "./pages/Auth";
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/courses" element={<Layout><Courses /></Layout>} />
+            <Route path="/dsa-sheet" element={<Layout><DSASheet /></Layout>} />
+            <Route path="/dsa-sheet/:topicId" element={<Layout><DSATopic /></Layout>} />
             <Route path="/future-integrations" element={<Layout><FutureIntegrations /></Layout>} />
             <Route path="/course-generator" element={<Layout><CourseGenerator /></Layout>} />
             <Route path="/course/:id" element={<Layout><CourseDetail /></Layout>} />

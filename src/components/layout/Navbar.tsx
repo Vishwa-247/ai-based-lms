@@ -26,6 +26,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Courses", href: "/courses" },
+    { name: "DSA Sheet", href: "/dsa-sheet" },
     { name: "Learn", href: "/course-generator" },
     { name: "Interview", href: "/mock-interview" },
     { name: "Dashboard", href: "/dashboard" },
