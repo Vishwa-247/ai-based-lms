@@ -145,5 +145,121 @@ export const dsaTopics: DSATopic[] = [
       { name: "Minimum Xor Value", url: "https://www.interviewbit.com/problems/min-xor-value/" },
       { name: "Max Xor In a Range [L,R]", url: "https://www.geeksforgeeks.org/maximum-xor-value-of-a-pair-from-a-range/" }
     ]
+  },
+  {
+    id: "linked-lists",
+    title: "Linked Lists",
+    icon: "🔗",
+    totalProblems: 11,
+    solvedProblems: 0,
+    problems: [
+      { name: "Reverse Linked List", url: "https://leetcode.com/problems/reverse-linked-list/" },
+      { name: "Merge Two Sorted Lists", url: "https://leetcode.com/problems/merge-two-sorted-lists/" },
+      { name: "Remove Nth Node From End of List", url: "https://leetcode.com/problems/remove-nth-node-from-end-of-list/" },
+      { name: "Palindrome Linked List", url: "https://leetcode.com/problems/palindrome-linked-list/" },
+      { name: "Add Two Numbers", url: "https://leetcode.com/problems/add-two-numbers/" },
+      { name: "Intersection of Two Linked Lists", url: "https://leetcode.com/problems/intersection-of-two-linked-lists/" },
+      { name: "Design Linked List", url: "https://leetcode.com/problems/design-linked-list/" },
+      { name: "Linked List Cycle", url: "https://leetcode.com/problems/linked-list-cycle/" },
+      { name: "Sort List", url: "https://leetcode.com/problems/sort-list/" },
+      { name: "Copy List with Random Pointer", url: "https://leetcode.com/problems/copy-list-with-random-pointer/" },
+      { name: "Flatten a Multilevel Doubly Linked List", url: "https://leetcode.com/problems/flatten-a-multilevel-doubly-linked-list/" }
+    ]
+  },
+  {
+    id: "stacks-queues",
+    title: "Stacks and Queues",
+    icon: "📚",
+    totalProblems: 9,
+    solvedProblems: 0,
+    problems: [
+      { name: "Valid Parentheses", url: "https://leetcode.com/problems/valid-parentheses" },
+      { name: "Min Stack", url: "https://leetcode.com/problems/min-stack/" },
+      { name: "Implement Queue using Stacks", url: "https://leetcode.com/problems/implement-queue-using-stacks/" },
+      { name: "Implement Stack using Queues", url: "https://leetcode.com/problems/implement-stack-using-queues/" },
+      { name: "Sliding Window Maximum", url: "https://leetcode.com/problems/sliding-window-maximum/" },
+      { name: "Next Greater Element I", url: "https://leetcode.com/problems/next-greater-element-i/" },
+      { name: "Daily Temperatures", url: "https://leetcode.com/problems/daily-temperatures/" },
+      { name: "Evaluate Reverse Polish Notation", url: "https://leetcode.com/problems/evaluate-reverse-polish-notation/" },
+      { name: "LRU Cache", url: "https://leetcode.com/problems/lru-cache/" }
+    ]
+  },
+  {
+    id: "trees",
+    title: "Trees",
+    icon: "🌳",
+    totalProblems: 10,
+    solvedProblems: 0,
+    problems: [
+      { name: "Binary Tree Inorder Traversal", url: "https://leetcode.com/problems/binary-tree-inorder-traversal/" },
+      { name: "Binary Tree Preorder Traversal", url: "https://leetcode.com/problems/binary-tree-preorder-traversal/" },
+      { name: "Binary Tree Postorder Traversal", url: "https://leetcode.com/problems/binary-tree-postorder-traversal/" },
+      { name: "Maximum Depth of Binary Tree", url: "https://leetcode.com/problems/maximum-depth-of-binary-tree/" },
+      { name: "Same Tree", url: "https://leetcode.com/problems/same-tree/" },
+      { name: "Symmetric Tree", url: "https://leetcode.com/problems/symmetric-tree/" },
+      { name: "Convert Sorted Array to Binary Search Tree", url: "https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/" },
+      { name: "Lowest Common Ancestor of a BST", url: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/" },
+      { name: "Binary Tree Level Order Traversal", url: "https://leetcode.com/problems/binary-tree-level-order-traversal/" },
+      { name: "Validate Binary Search Tree", url: "https://leetcode.com/problems/validate-binary-search-tree/" }
+    ]
+  },
+  {
+    id: "graphs",
+    title: "Graphs",
+    icon: "🕸️",
+    totalProblems: 12,
+    solvedProblems: 0,
+    problems: [
+      { name: "BFS of graph", url: "https://practice.geeksforgeeks.org/problems/bfs-traversal-of-graph/1" },
+      { name: "Is Graph Bipartite?", url: "https://leetcode.com/problems/is-graph-bipartite/" },
+      { name: "Number of Islands", url: "https://leetcode.com/problems/number-of-islands/" },
+      { name: "Clone Graph", url: "https://leetcode.com/problems/clone-graph/" },
+      { name: "Bus routes", url: "https://leetcode.com/problems/bus-routes/" },
+      { name: "Prim's Algo", url: "https://www.spoj.com/problems/MST/" },
+      { name: "Connecting cities with minimum cost", url: "https://www.geeksforgeeks.org/minimum-cost-connect-cities/" },
+      { name: "Graph Valid Tree", url: "https://leetcode.com/problems/graph-valid-tree/" },
+      { name: "Course Schedule", url: "https://leetcode.com/problems/course-schedule/" },
+      { name: "Course Schedule II", url: "https://leetcode.com/problems/course-schedule-ii/" },
+      { name: "Word Ladder", url: "https://leetcode.com/problems/word-ladder/" },
+      { name: "Shortest Path in Binary Matrix", url: "https://leetcode.com/problems/shortest-path-in-binary-matrix/" }
+    ]
+  },
+  {
+    id: "dynamic-programming",
+    title: "Dynamic Programming",
+    icon: "⚡",
+    totalProblems: 10,
+    solvedProblems: 0,
+    problems: [
+      { name: "Climbing Stairs", url: "https://leetcode.com/problems/climbing-stairs/" },
+      { name: "Coin Change", url: "https://leetcode.com/problems/coin-change/" },
+      { name: "Longest Increasing Subsequence", url: "https://leetcode.com/problems/longest-increasing-subsequence/" },
+      { name: "House Robber", url: "https://leetcode.com/problems/house-robber/" },
+      { name: "House Robber II", url: "https://leetcode.com/problems/house-robber-ii/" },
+      { name: "Unique Paths", url: "https://leetcode.com/problems/unique-paths/" },
+      { name: "Jump Game", url: "https://leetcode.com/problems/jump-game/" },
+      { name: "Min Cost Climbing Stairs", url: "https://leetcode.com/problems/min-cost-climbing-stairs/" },
+      { name: "Decode Ways", url: "https://leetcode.com/problems/decode-ways/" },
+      { name: "Word Break", url: "https://leetcode.com/problems/word-break/" }
+    ]
+  },
+  {
+    id: "trie",
+    title: "Trie",
+    icon: "🌲",
+    totalProblems: 10,
+    solvedProblems: 0,
+    problems: [
+      { name: "Implement Trie (Prefix Tree)", url: "https://leetcode.com/problems/implement-trie-prefix-tree/" },
+      { name: "Add and Search Word - Data structure design", url: "https://leetcode.com/problems/add-and-search-word-data-structure-design/" },
+      { name: "Word Search II", url: "https://leetcode.com/problems/word-search-ii/" },
+      { name: "Replace Words", url: "https://leetcode.com/problems/replace-words/" },
+      { name: "Palindrome Pairs", url: "https://leetcode.com/problems/palindrome-pairs/" },
+      { name: "Maximum XOR of Two Numbers in an Array", url: "https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/" },
+      { name: "Concatenated Words", url: "https://leetcode.com/problems/concatenated-words/" },
+      { name: "Word Squares", url: "https://leetcode.com/problems/word-squares/" },
+      { name: "Design Search Autocomplete System", url: "https://leetcode.com/problems/design-search-autocomplete-system/" },
+      { name: "Stream of Characters", url: "https://leetcode.com/problems/stream-of-characters/" }
+    ]
   }
 ];
