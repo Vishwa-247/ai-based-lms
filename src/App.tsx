@@ -14,6 +14,7 @@ import CourseDetail from "./pages/CourseDetail";
 import Courses from "./pages/Courses";
 import DSASheet from "./pages/DSASheet";
 import DSATopic from "./pages/DSATopic";
+import CompanyProblems from "./pages/CompanyProblems";
 import InterviewResult from "./pages/InterviewResult";
 import FutureIntegrations from "./pages/FutureIntegrations";
 import Auth from "./pages/Auth";
@@ -41,7 +42,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/courses" element={<Layout><Courses /></Layout>} />
             <Route path="/dsa-sheet" element={<Layout><DSASheet /></Layout>} />
-            <Route path="/dsa-sheet/:topicId" element={<Layout><DSATopic /></Layout>} />
+            <Route path="/dsa-sheet/topic/:topicId" element={<Layout><DSATopic /></Layout>} />
+            <Route path="/dsa-sheet/company/:companyId" element={<Layout><CompanyProblems /></Layout>} />
             <Route path="/future-integrations" element={<Layout><FutureIntegrations /></Layout>} />
             <Route path="/course-generator" element={<Layout><CourseGenerator /></Layout>} />
             <Route path="/course/:id" element={<Layout><CourseDetail /></Layout>} />
