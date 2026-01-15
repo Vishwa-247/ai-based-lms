@@ -1,6 +1,6 @@
 const CodeEditorMockup = () => {
   return (
-    <div className="mac-window w-full max-w-2xl">
+    <div className="mac-window w-full max-w-2xl relative">
       {/* Mac Titlebar */}
       <div className="mac-titlebar">
         <div className="flex gap-2">
@@ -14,17 +14,17 @@ const CodeEditorMockup = () => {
       </div>
 
       {/* Code Editor Content */}
-      <div className="code-editor p-4 min-h-[320px]">
+      <div className="code-editor p-5 min-h-[360px]">
         <div className="flex">
           {/* Line Numbers */}
-          <div className="text-[#6E7681] text-right pr-4 select-none border-r border-[#21262D] mr-4">
+          <div className="text-[#6e7681] text-right pr-4 select-none border-r border-[#21262d] mr-4">
             {Array.from({ length: 18 }, (_, i) => (
-              <div key={i} className="leading-6">{i + 1}</div>
+              <div key={i} className="leading-6 text-xs">{i + 1}</div>
             ))}
           </div>
 
           {/* Code Content */}
-          <div className="flex-1 overflow-x-auto">
+          <div className="flex-1 overflow-x-auto text-[13px]">
             <div className="leading-6">
               <span className="code-keyword">class</span>{" "}
               <span className="code-type">AgenticEvaluator</span>:
@@ -55,28 +55,28 @@ const CodeEditorMockup = () => {
               <span>: </span>
               <span className="code-number">0.92</span>
               <span>,</span>
-              <span className="text-[#28C840] ml-4"># High</span>
+              <span className="text-[#28c840] ml-4 text-xs"># High</span>
             </div>
             <div className="leading-6">
               <span className="code-string">            "tradeoffs"</span>
               <span>: </span>
               <span className="code-number">0.88</span>
               <span>,</span>
-              <span className="text-[#28C840] ml-4"># Good</span>
+              <span className="text-[#28c840] ml-4 text-xs"># Good</span>
             </div>
             <div className="leading-6">
               <span className="code-string">            "adaptability"</span>
               <span>: </span>
               <span className="code-number">0.65</span>
               <span>,</span>
-              <span className="text-[#FEBC2E] ml-4"># Needs Work</span>
+              <span className="text-[#febc2e] ml-4 text-xs"># Needs Work</span>
             </div>
             <div className="leading-6">
               <span className="code-string">            "failure_aware"</span>
               <span>: </span>
               <span className="code-number">0.78</span>
               <span>,</span>
-              <span className="text-[#28C840] ml-4"># Good</span>
+              <span className="text-[#28c840] ml-4 text-xs"># Good</span>
             </div>
             <div className="leading-6">
               <span>        {`}`}</span>
@@ -107,27 +107,27 @@ const CodeEditorMockup = () => {
         </div>
 
         {/* Evaluation Labels Overlay */}
-        <div className="mt-4 pt-4 border-t border-[#21262D]">
-          <div className="flex items-center gap-6 text-xs font-mono">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#28C840]" />
-              <span className="text-[#8B949E]">Clarity:</span>
-              <span className="text-[#28C840]">High</span>
+        <div className="mt-5 pt-4 border-t border-[#21262d]">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#28c840]/10 border border-[#28c840]/20">
+              <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+              <span className="text-[#8b949e]">Clarity:</span>
+              <span className="text-[#28c840] font-medium">High</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#28C840]" />
-              <span className="text-[#8B949E]">Tradeoffs:</span>
-              <span className="text-[#28C840]">Good</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#28c840]/10 border border-[#28c840]/20">
+              <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+              <span className="text-[#8b949e]">Tradeoffs:</span>
+              <span className="text-[#28c840] font-medium">Good</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#FEBC2E]" />
-              <span className="text-[#8B949E]">Adaptability:</span>
-              <span className="text-[#FEBC2E]">Needs Work</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#febc2e]/10 border border-[#febc2e]/20">
+              <div className="w-2 h-2 rounded-full bg-[#febc2e]" />
+              <span className="text-[#8b949e]">Adaptability:</span>
+              <span className="text-[#febc2e] font-medium">Needs Work</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#28C840]" />
-              <span className="text-[#8B949E]">Awareness:</span>
-              <span className="text-[#28C840]">Good</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#28c840]/10 border border-[#28c840]/20">
+              <div className="w-2 h-2 rounded-full bg-[#28c840]" />
+              <span className="text-[#8b949e]">Awareness:</span>
+              <span className="text-[#28c840] font-medium">Good</span>
             </div>
           </div>
         </div>
