@@ -42,13 +42,16 @@ const modules = [
 
 const ModulesSection = () => {
   return (
-    <section className="py-24">
+    <section id="platform" className="py-28">
       <div className="container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
+          <span className="text-sm font-medium text-primary uppercase tracking-wider mb-4 block">
+            Features
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-5">
             Product Modules
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-lg">
             Comprehensive toolkit for systematic career preparation.
           </p>
         </div>
@@ -57,15 +60,15 @@ const ModulesSection = () => {
           {modules.map((module) => (
             <div
               key={module.title}
-              className="p-6 bg-card border border-border rounded-lg hover:border-primary/30 transition-colors group"
+              className="feature-card group"
             >
-              <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-muted mb-4 group-hover:bg-primary/10 transition-colors">
-                <module.icon className="w-5 h-5 text-primary" />
+              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary/10 mb-5 group-hover:bg-primary/15 transition-colors">
+                <module.icon className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 {module.title}
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 {module.description}
               </p>
             </div>

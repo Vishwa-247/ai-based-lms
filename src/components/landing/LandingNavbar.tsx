@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { Play, ArrowRight, Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StudyMateLogo from "./StudyMateLogo";
 import { useEffect, useState } from "react";
 
 const LandingNavbar = () => {
   const [isDark, setIsDark] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     // Check for saved theme or system preference
@@ -16,6 +17,13 @@ const LandingNavbar = () => {
       setIsDark(true);
       document.documentElement.classList.add("dark");
     }
+
+    // Scroll listener
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const toggleTheme = () => {
@@ -30,19 +38,25 @@ const LandingNavbar = () => {
   };
 
   const navLinks = [
-    { label: "Platform", href: "#platform" },
+    { label: "Features", href: "#platform" },
+    { label: "How It Works", href: "#how-it-works" },
     { label: "Architecture", href: "#architecture" },
-    { label: "Metrics", href: "#metrics" },
     { label: "About", href: "#credibility" },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? "bg-background/90 backdrop-blur-md border-b border-border" 
+          : "bg-transparent"
+      }`}
+    >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <StudyMateLogo className="w-8 h-8 text-foreground" />
+            <StudyMateLogo className="w-8 h-8 text-primary" />
             <span className="font-semibold text-lg text-foreground">StudyMate</span>
           </Link>
 
@@ -52,7 +66,7 @@ const LandingNavbar = () => {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {link.label}
               </a>
@@ -60,22 +74,28 @@ const LandingNavbar = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
               aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <Link to="/auth">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
+            <Link to="/auth" className="hidden sm:block">
+              <Button variant="ghost" size="sm" className="text-muted-foreground font-medium">
                 Sign In
               </Button>
             </Link>
             <Link to="/courses">
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Get Started
+              <Button 
+                size="sm" 
+                className="btn-gradient text-white font-medium rounded-full px-5 gap-1.5"
+              >
+                <span className="relative z-10 flex items-center gap-1.5">
+                  Get Started
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
               </Button>
             </Link>
           </div>
