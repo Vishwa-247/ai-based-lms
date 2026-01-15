@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import StudyMateLogo from "./StudyMateLogo";
 
 const footerLinks = [
   {
@@ -33,26 +32,27 @@ const footerLinks = [
 
 const LandingFooter = () => {
   return (
-    <footer className="py-20 bg-background">
+    <footer className="py-16 bg-background border-t border-border">
       <div className="container mx-auto px-6">
-        <div className="grid md:grid-cols-5 gap-12 pb-16 border-b border-border">
+        <div className="grid md:grid-cols-5 gap-10 pb-12 border-b border-border">
           {/* Brand Column */}
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center gap-3 mb-5">
-              <StudyMateLogo className="w-9 h-9 text-primary" />
-              <span className="font-semibold text-xl text-foreground">StudyMate</span>
+            <Link to="/" className="flex items-center gap-2.5 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">S</span>
+              </div>
+              <span className="font-semibold text-foreground">StudyMate</span>
             </Link>
-            <p className="text-muted-foreground leading-relaxed max-w-xs mb-6">
-              Agentic Career Intelligence Platform. Engineer your path to success with 
-              AI-powered preparation and quantified feedback.
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-5">
+              Agentic Career Intelligence Platform. Engineer your path with AI-powered preparation.
             </p>
-            {/* Social Links Placeholder */}
-            <div className="flex items-center gap-4">
+            {/* Social Links */}
+            <div className="flex items-center gap-3">
               {["twitter", "linkedin", "github"].map((social) => (
                 <a 
                   key={social}
                   href="#" 
-                  className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                  className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                 >
                   <span className="sr-only">{social}</span>
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -74,8 +74,8 @@ const LandingFooter = () => {
           {/* Link Columns */}
           {footerLinks.map((column) => (
             <div key={column.title}>
-              <h4 className="font-semibold text-foreground mb-5">{column.title}</h4>
-              <ul className="space-y-3">
+              <h4 className="text-sm font-semibold text-foreground mb-4">{column.title}</h4>
+              <ul className="space-y-2.5">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -92,20 +92,16 @@ const LandingFooter = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} StudyMate. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <Link to="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Privacy Policy
-            </Link>
-            <Link to="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Terms of Service
-            </Link>
-            <Link to="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Cookies
-            </Link>
+            {["Privacy", "Terms", "Cookies"].map((item) => (
+              <Link key={item} to="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                {item}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

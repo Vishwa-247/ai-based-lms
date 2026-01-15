@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { Moon, Sun, ArrowRight } from "lucide-react";
+import { Moon, Sun, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import StudyMateLogo from "./StudyMateLogo";
 import { useEffect, useState } from "react";
 
 const LandingNavbar = () => {
@@ -9,7 +8,6 @@ const LandingNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    // Check for saved theme or system preference
     const savedTheme = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     
@@ -18,9 +16,8 @@ const LandingNavbar = () => {
       document.documentElement.classList.add("dark");
     }
 
-    // Scroll listener
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -46,27 +43,29 @@ const LandingNavbar = () => {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         isScrolled 
-          ? "bg-background/90 backdrop-blur-md border-b border-border" 
+          ? "bg-background/95 backdrop-blur-sm border-b border-border" 
           : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <StudyMateLogo className="w-8 h-8 text-primary" />
-            <span className="font-semibold text-lg text-foreground">StudyMate</span>
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">S</span>
+            </div>
+            <span className="font-semibold text-foreground">StudyMate</span>
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
               >
                 {link.label}
               </a>
@@ -74,30 +73,31 @@ const LandingNavbar = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="w-10 h-10 flex items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+              className="w-9 h-9 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
               aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {isDark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
             </button>
-            <Link to="/auth" className="hidden sm:block">
-              <Button variant="ghost" size="sm" className="text-muted-foreground font-medium">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/courses">
-              <Button 
-                size="sm" 
-                className="btn-gradient text-white font-medium rounded-full px-5 gap-1.5"
-              >
-                <span className="relative z-10 flex items-center gap-1.5">
+            
+            <div className="hidden sm:flex items-center gap-2">
+              <Link to="/auth">
+                <Button variant="ghost" size="sm" className="text-muted-foreground font-medium h-9">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/courses">
+                <Button size="sm" className="bg-primary text-primary-foreground font-medium h-9 px-4">
                   Get Started
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </Button>
-            </Link>
+                </Button>
+              </Link>
+            </div>
+
+            <button className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
+              <Menu className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>
