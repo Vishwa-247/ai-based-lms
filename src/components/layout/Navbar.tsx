@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, LogOut, User } from "lucide-react";
 import Container from "../ui/Container";
-import GlassMorphism from "../ui/GlassMorphism";
 import { useAuth } from "@/context/AuthContext";
 import { 
   DropdownMenu,
@@ -70,7 +69,7 @@ const Navbar = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? "py-3" : "py-4"
-      } bg-white/90 dark:bg-background/90 backdrop-blur-sm border-b border-border/40 shadow-sm`}
+      } bg-background/92 backdrop-blur-xl border-b border-border/60 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.45)]`}
     >
       <Container>
         <div className="flex items-center justify-between h-18">

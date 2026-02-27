@@ -9,11 +9,13 @@ const LandingNavbar = () => {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    
-    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+
+    if (savedTheme === "dark") {
       setIsDark(true);
       document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
 
     const handleScroll = () => {
@@ -45,7 +47,7 @@ const LandingNavbar = () => {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
         isScrolled 
-          ? "bg-background/95 backdrop-blur-sm border-b border-border" 
+          ? "bg-background/92 backdrop-blur-xl border-b border-border/80 shadow-[0_8px_30px_-20px_rgba(15,23,42,0.35)]" 
           : "bg-transparent"
       }`}
     >
@@ -65,7 +67,7 @@ const LandingNavbar = () => {
               <a
                 key={link.label}
                 href={link.href}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/80"
               >
                 {link.label}
               </a>

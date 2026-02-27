@@ -103,6 +103,15 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image:
+      radial-gradient(circle at 10% 10%, hsl(var(--primary) / 0.07), transparent 35%),
+      radial-gradient(circle at 85% 0%, hsl(var(--accent) / 0.06), transparent 30%);
+    background-attachment: fixed;
+    transition: background-color 250ms ease, color 250ms ease;
+  }
+
+  #root {
+    @apply min-h-screen;
   }
 
   /* Custom Scrollbar - Minimal */
@@ -355,4 +364,13 @@ h4 {
 /* Selection */
 ::selection {
   @apply bg-primary/20 text-foreground;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
